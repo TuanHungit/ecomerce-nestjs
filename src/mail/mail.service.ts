@@ -23,9 +23,7 @@ export class MailService {
       template: '/activation',
       context: {
         title: await this.i18n.t('common.confirmEmail'),
-        url: `${this.configService.get('app.frontendDomain')}/confirm-email/${
-          mailData.data.hash
-        }`,
+        url: `#${mailData.data.hash}`,
         actionTitle: await this.i18n.t('common.confirmEmail'),
         app_name: this.configService.get('app.name'),
         text1: await this.i18n.t('confirm-email.text1'),

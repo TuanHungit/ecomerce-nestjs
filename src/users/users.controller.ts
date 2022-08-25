@@ -16,13 +16,15 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FliterUserDto } from './dto/filter-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/roles/roles.decorator';
 import { RoleEnum } from 'src/roles/roles.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/roles/roles.guard';
-import { infinityPagination } from 'src/utils/infinity-pagination';
-import { StatusEnum } from 'src/statuses/statuses.enum';
+import { User } from './entities/user.entity';
+import { EntityCondition } from 'src/utils/types/entity-condition.type';
+import { FindOneOptions } from 'typeorm';
 
 @ApiBearerAuth()
 @Roles(RoleEnum.admin)
@@ -41,37 +43,35 @@ export class UsersController {
     return this.usersService.create(createProfileDto);
   }
 
-  @Get()
+  @Post('paging')
   @HttpCode(HttpStatus.OK)
   async findAll(
+    @Body() filters: FliterUserDto,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort: number,
-    @Query('column', new DefaultValuePipe('id')) column: string,
-    @Query('fields') fields: string,
+    @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
+    @Query('column', new DefaultValuePipe('id')) column?: string,
+    @Query('fields') fields?: string,
   ) {
     if (limit > 50) {
       limit = 50;
     }
-
-    return infinityPagination(
-      await this.usersService.findManyWithPagination(
-        {
-          page,
-          limit,
-        },
-        { email: 'hung' },
-        { status: { id: StatusEnum.active } },
-        { [column]: sort },
-      ),
-      { page, limit },
+    return await this.usersService.findManyWithPagination(
+      {
+        page,
+        limit,
+      },
+      fields,
+      { ...filters } as EntityCondition<User>,
+      { [column]: sort },
+      ['fullName'],
     );
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne({ id: +id });
+    return this.usersService.findOne({ id } as FindOneOptions<User>);
   }
 
   @Patch(':id')

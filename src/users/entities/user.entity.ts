@@ -26,8 +26,13 @@ export class User extends EntityHelper {
   @Column({ unique: true, nullable: true })
   email: string | null;
 
+  @Column({ unique: true, nullable: true })
+  username: string;
+
   @Column({ nullable: true })
   password: string;
+
+  public previousUsername: string;
 
   public previousPassword: string;
 
@@ -36,12 +41,28 @@ export class User extends EntityHelper {
     this.previousPassword = this.password;
   }
 
+  @AfterLoad()
+  public loadPreviousUsername(): void {
+    this.previousUsername = this.username;
+  }
+
   @BeforeInsert()
   @BeforeUpdate()
   async setPassword() {
     if (this.previousPassword !== this.password && this.password) {
       const salt = await bcrypt.genSalt();
       this.password = await bcrypt.hash(this.password, salt);
+    }
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  setUsername() {
+    if (
+      (!this.username || this.previousUsername !== this.username) &&
+      this.email
+    ) {
+      this.username = this.email.split('@')[0];
     }
   }
 
@@ -61,6 +82,9 @@ export class User extends EntityHelper {
 
   @Column({ nullable: true })
   gender?: string;
+
+  @Column({ nullable: true })
+  phoneNumber?: string;
 
   @ManyToOne(() => FileEntity, {
     eager: true,

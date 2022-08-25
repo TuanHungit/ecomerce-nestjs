@@ -1,7 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BaseEntity, DeleteResult, Repository, FindOneOptions } from 'typeorm';
+import {
+  BaseEntity,
+  DeleteResult,
+  Repository,
+  FindOneOptions,
+  FindOptionsOrder,
+  FindOptionsWhere,
+  Like,
+} from 'typeorm';
 import { IBaseService } from '../interfaces/i.base.service';
 import { EntityId } from 'typeorm/repository/EntityId';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import { infinityPagination } from 'src/utils/infinity-pagination';
 
 export class BaseService<T extends BaseEntity, R extends Repository<T>>
   implements IBaseService<T>
@@ -12,15 +22,46 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     this.repository = repository;
   }
 
-  getAll(): Promise<T[]> {
-    return this.repository.find();
+  async findManyWithPagination(
+    paginationOptions: IPaginationOptions,
+    fields?: string,
+    wheres?: FindOptionsWhere<T>,
+    orders?: FindOptionsOrder<T>,
+    likes?: (keyof T)[],
+  ) {
+    const selects: (keyof T)[] = [];
+    if (fields) {
+      fields.split(',').forEach((el) => {
+        if (el as keyof T) {
+          selects.push(el as keyof T);
+        }
+      });
+    }
+    if (likes) {
+      likes.forEach((el: any) => {
+        if (wheres[el]) {
+          wheres[el] = Like(`%${wheres[el]}%`);
+        }
+      });
+    }
+    return infinityPagination(
+      await this.repository.find({
+        skip: (paginationOptions.page - 1) * paginationOptions.limit,
+        take: paginationOptions.limit,
+        select: selects,
+        where: wheres,
+        order: orders,
+        cache: true,
+      }),
+      paginationOptions,
+    );
   }
 
-  findByOptions(conditions: FindOneOptions<T>): Promise<T> {
-    return this.repository.findOne(conditions);
+  findOne(fields: FindOneOptions<T>): Promise<T> {
+    return this.repository.findOne(fields);
   }
 
-  store(data: any): Promise<T> {
+  create(data: any): Promise<T> {
     return this.repository.save(data);
   }
 
@@ -31,5 +72,9 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
 
   delete(id: EntityId): Promise<DeleteResult> {
     return this.repository.delete(id);
+  }
+
+  changeStatus(id: EntityId) {
+    return id;
   }
 }

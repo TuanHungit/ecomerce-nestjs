@@ -4,7 +4,13 @@ import { CreateUserDto } from './create-user.dto';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../../roles/entities/role.entity';
-import { IsEmail, IsOptional, MinLength, Validate } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsPhoneNumber,
+  MinLength,
+  Validate,
+} from 'class-validator';
 import { Status } from '../../statuses/entities/status.entity';
 import { IsNotExist } from '../../utils/validators/is-not-exists.validator';
 import { FileEntity } from '../../files/entities/file.entity';
@@ -36,6 +42,10 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty()
   @IsOptional()
   gender?: string;
+
+  @ApiProperty()
+  @IsPhoneNumber()
+  phoneNumber?: string;
 
   @ApiProperty({ example: 'Nguyen Tuan Hung' })
   @IsOptional()

@@ -7,6 +7,7 @@ import {
   IsOptional,
   MinLength,
   Validate,
+  IsPhoneNumber,
 } from 'class-validator';
 import { Status } from '../../statuses/entities/status.entity';
 import { IsNotExist } from '../../utils/validators/is-not-exists.validator';
@@ -39,6 +40,10 @@ export class CreateUserDto {
 
   @ApiProperty()
   gender?: string;
+
+  @ApiProperty()
+  @IsPhoneNumber()
+  phoneNumber?: string;
 
   @ApiProperty({ type: () => FileEntity })
   @IsOptional()
