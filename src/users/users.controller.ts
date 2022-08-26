@@ -34,7 +34,7 @@ import { EntityCondition } from 'src/utils/types/entity-condition.type';
   version: '1',
 })
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
