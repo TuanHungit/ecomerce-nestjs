@@ -3,15 +3,16 @@ import {
   BaseEntity,
   DeleteResult,
   Repository,
-  FindOneOptions,
   FindOptionsOrder,
   FindOptionsWhere,
   Like,
+  DeepPartial,
 } from 'typeorm';
 import { IBaseService } from '../interfaces/i.base.service';
 import { EntityId } from 'typeorm/repository/EntityId';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { infinityPagination } from 'src/utils/infinity-pagination';
+import { EntityCondition } from 'src/utils/types/entity-condition.type';
 
 export class BaseService<T extends BaseEntity, R extends Repository<T>>
   implements IBaseService<T>
@@ -57,12 +58,14 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     );
   }
 
-  findOne(fields: FindOneOptions<T>): Promise<T> {
-    return this.repository.findOne(fields);
+  findOne(fields: EntityCondition<T>): Promise<T> {
+    return this.repository.findOne({
+      where: fields,
+    });
   }
 
-  create(data: any): Promise<T> {
-    return this.repository.save(data);
+  create(data: DeepPartial<T>): Promise<T> {
+    return this.repository.save(this.repository.create(data));
   }
 
   async update(id: EntityId, data: any): Promise<T> {

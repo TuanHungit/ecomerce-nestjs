@@ -17,7 +17,6 @@ import { AuthRegisterLoginDto } from './dto/auth-register-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { ForgotService } from 'src/forgot/forgot.service';
 import { MailService } from 'src/mail/mail.service';
-import { FindOneOptions } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +25,7 @@ export class AuthService {
     private usersService: UsersService,
     private forgotService: ForgotService,
     private mailService: MailService,
-  ) {}
+  ) { }
 
   async validateLogin(
     loginDto: AuthEmailLoginDto,
@@ -34,7 +33,7 @@ export class AuthService {
   ): Promise<{ token: string; user: User }> {
     const user = await this.usersService.findOne({
       email: loginDto.email,
-    } as FindOneOptions<User>);
+    });
 
     if (
       !user ||
@@ -100,12 +99,12 @@ export class AuthService {
 
     const userByEmail = await this.usersService.findOne({
       email: socialEmail,
-    } as FindOneOptions<User>);
+    });
 
     user = await this.usersService.findOne({
       socialId: socialData.id,
       provider: authProvider,
-    } as FindOneOptions<User>);
+    });
 
     if (user) {
       if (socialEmail && !userByEmail) {
@@ -133,7 +132,7 @@ export class AuthService {
 
       user = await this.usersService.findOne({
         id: user.id,
-      } as FindOneOptions<User>);
+      });
     }
 
     const jwtToken = await this.jwtService.sign({
@@ -176,7 +175,7 @@ export class AuthService {
   async confirmEmail(hash: string): Promise<void> {
     const user = await this.usersService.findOne({
       hash,
-    } as FindOneOptions<User>);
+    });
 
     if (!user) {
       throw new HttpException(
@@ -198,7 +197,7 @@ export class AuthService {
   async forgotPassword(email: string): Promise<void> {
     const user = await this.usersService.findOne({
       email,
-    } as FindOneOptions<User>);
+    });
 
     if (!user) {
       throw new HttpException(
@@ -257,7 +256,7 @@ export class AuthService {
   async me(user: User): Promise<User> {
     return this.usersService.findOne({
       id: user.id,
-    } as FindOneOptions<User>);
+    });
   }
 
   async update(user: User, userDto: AuthUpdateDto): Promise<User> {
@@ -265,7 +264,7 @@ export class AuthService {
       if (userDto.oldPassword) {
         const currentUser = await this.usersService.findOne({
           id: user.id,
-        } as FindOneOptions<User>);
+        });
 
         const isValidOldPassword = await bcrypt.compare(
           userDto.oldPassword,
@@ -300,7 +299,7 @@ export class AuthService {
 
     return this.usersService.findOne({
       id: user.id,
-    } as FindOneOptions<User>);
+    });
   }
 
   async softDelete(user: User): Promise<void> {

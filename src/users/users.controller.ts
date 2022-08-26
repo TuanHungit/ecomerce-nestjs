@@ -24,7 +24,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/roles/roles.guard';
 import { User } from './entities/user.entity';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
-import { FindOneOptions } from 'typeorm';
 
 @ApiBearerAuth()
 @Roles(RoleEnum.admin)
@@ -35,7 +34,7 @@ import { FindOneOptions } from 'typeorm';
   version: '1',
 })
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -71,7 +70,7 @@ export class UsersController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne({ id } as FindOneOptions<User>);
+    return this.usersService.findOne({ id: +id });
   }
 
   @Patch(':id')

@@ -1,7 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, MinLength, Validate } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  MinLength,
+  Validate,
+} from 'class-validator';
 import { IsExist } from '../../utils/validators/is-exists.validator';
 import { FileEntity } from '../../files/entities/file.entity';
+import { IsNotExist } from 'src/utils/validators/is-not-exists.validator';
 
 export class AuthUpdateDto {
   @ApiProperty({ type: () => FileEntity })
@@ -10,6 +17,13 @@ export class AuthUpdateDto {
     message: 'imageNotExists',
   })
   photo?: FileEntity;
+
+  @ApiProperty()
+  @IsOptional()
+  @Validate(IsNotExist, ['User'], {
+    message: 'usernameAlreadyExists',
+  })
+  username?: string | null;
 
   @ApiProperty({ example: 'Nguyen Tuan Hung' })
   @IsOptional()
@@ -25,6 +39,11 @@ export class AuthUpdateDto {
   @IsOptional()
   @IsNotEmpty()
   gender?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsPhoneNumber('VN')
+  phoneNumber?: string;
 
   @ApiProperty()
   @IsOptional()

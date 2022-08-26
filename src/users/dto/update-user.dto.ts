@@ -28,6 +28,13 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty()
   @IsOptional()
+  @Validate(IsNotExist, ['User'], {
+    message: 'usernameAlreadyExists',
+  })
+  username?: string | null;
+
+  @ApiProperty()
+  @IsOptional()
   @MinLength(6)
   password?: string;
 
@@ -44,7 +51,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   gender?: string;
 
   @ApiProperty()
-  @IsPhoneNumber()
+  @IsPhoneNumber('VN')
   phoneNumber?: string;
 
   @ApiProperty({ example: 'Nguyen Tuan Hung' })
