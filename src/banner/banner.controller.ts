@@ -1,4 +1,79 @@
-import { Controller } from '@nestjs/common';
+import { UpdateBannerDto } from './dto/update-banner.dto';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { EntityCondition } from 'src/utils/types/entity-condition.type';
+import { BannerService } from './banner.service';
+import { CreateBannerDto } from './dto/create-banner.dto';
+import { FilterBannerDto } from './dto/filter-banner.dto';
+import { Banner } from './entities/banner.entity';
 
-@Controller('banner')
-export class BannerController {}
+@ApiTags('Banners')
+@Controller({
+  path: 'banners',
+  version: '1',
+})
+export class BannerController {
+  constructor(private bannerService: BannerService) {}
+
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  create(@Body() banner: CreateBannerDto) {
+    console.log(banner);
+    return this.bannerService.create(banner);
+  }
+
+  @Post('paging')
+  @HttpCode(HttpStatus.OK)
+  paging(
+    @Body() filters: FilterBannerDto,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
+    @Query('column', new DefaultValuePipe('id')) column?: string,
+    @Query('fields') fields?: string,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+    return this.bannerService.findManyWithPagination(
+      {
+        page,
+        limit,
+      },
+      fields,
+      { ...filters } as EntityCondition<Banner>,
+      { [column]: sort },
+      ['title'],
+    );
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  findOne(@Param('id') id: string) {
+    return this.bannerService.findOne({ id: +id });
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  update(@Param('id') id: number, @Body() updateBannerDto: UpdateBannerDto) {
+    return this.bannerService.update(id, updateBannerDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: number) {
+    return this.bannerService.delete(id);
+  }
+}

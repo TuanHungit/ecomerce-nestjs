@@ -1,3 +1,4 @@
+import { BannerService } from './banner.service';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
@@ -8,6 +9,6 @@ import { Banner } from './entities/banner.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Banner])],
   controllers: [BannerController],
-  providers: [IsExist, IsNotExist],
+  providers: [IsExist, IsNotExist, BannerService],
 })
 export class BannerModule {}

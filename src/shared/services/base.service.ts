@@ -37,6 +37,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
           selects.push(el as keyof T);
         }
       });
+      selects.push('id' as keyof T);
     }
     if (likes) {
       likes.forEach((el: any) => {
@@ -58,14 +59,14 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     );
   }
 
-  findOne(fields: EntityCondition<T>): Promise<T> {
-    return this.repository.findOne({
+  async findOne(fields: EntityCondition<T>): Promise<T> {
+    return await this.repository.findOne({
       where: fields,
     });
   }
 
-  create(data: DeepPartial<T>): Promise<T> {
-    return this.repository.save(this.repository.create(data));
+  async create(data: DeepPartial<T>): Promise<T> {
+    return await this.repository.save(this.repository.create(data));
   }
 
   async update(id: EntityId, data: any): Promise<T> {
@@ -73,8 +74,8 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     return this.repository.findOneById(id);
   }
 
-  delete(id: EntityId): Promise<DeleteResult> {
-    return this.repository.delete(id);
+  async delete(id: EntityId): Promise<DeleteResult> {
+    return await this.repository.delete(id);
   }
 
   changeStatus(id: EntityId) {

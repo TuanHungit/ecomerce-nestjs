@@ -25,7 +25,7 @@ export class AuthService {
     private usersService: UsersService,
     private forgotService: ForgotService,
     private mailService: MailService,
-  ) { }
+  ) {}
 
   async validateLogin(
     loginDto: AuthEmailLoginDto,

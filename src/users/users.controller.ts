@@ -44,7 +44,7 @@ export class UsersController {
 
   @Post('paging')
   @HttpCode(HttpStatus.OK)
-  async findAll(
+  paging(
     @Body() filters: FliterUserDto,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -55,7 +55,7 @@ export class UsersController {
     if (limit > 50) {
       limit = 50;
     }
-    return await this.usersService.findManyWithPagination(
+    return this.usersService.findManyWithPagination(
       {
         page,
         limit,

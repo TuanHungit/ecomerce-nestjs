@@ -1,9 +1,11 @@
+import { Product } from './../../product/entity/product.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   AfterLoad,
   AfterInsert,
+  ManyToOne,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Allow } from 'class-validator';
@@ -19,6 +21,11 @@ export class FileEntity extends EntityHelper {
   @Allow()
   @Column()
   path: string;
+
+  @ManyToOne(() => Product, (product) => product.images, {
+    eager: false,
+  })
+  product: Product;
 
   @AfterLoad()
   @AfterInsert()
