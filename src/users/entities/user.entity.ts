@@ -81,7 +81,7 @@ export class User extends EntityHelper {
   birthday?: Date;
 
   @Column({ nullable: true })
-  gender?: string;
+  gender?: number;
 
   @Column({ nullable: true })
   phoneNumber?: string;

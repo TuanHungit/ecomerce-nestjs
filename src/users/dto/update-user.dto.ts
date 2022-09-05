@@ -48,7 +48,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty()
   @IsOptional()
-  gender?: string;
+  gender?: number;
 
   @ApiProperty()
   @IsPhoneNumber('VN')

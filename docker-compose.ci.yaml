@@ -31,3 +31,15 @@ services:
       dockerfile: Dockerfile.e2e
     depends_on:
       - postgres
+
+  pgadmin:
+    image: dpage/pgadmin4
+    expose:
+      - 80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: True
+      PGADMIN_CONFIG_LOGIN_BANNER: "Authorised users only!"
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 10
+

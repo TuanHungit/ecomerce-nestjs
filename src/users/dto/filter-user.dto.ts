@@ -14,7 +14,7 @@ export class FliterUserDto {
 
   @ApiProperty()
   @IsOptional()
-  gender?: string;
+  gender?: number;
 
   @ApiProperty()
   @IsOptional()

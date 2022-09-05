@@ -39,7 +39,7 @@ export class CreateUserDto {
   birthday?: Date;
 
   @ApiProperty()
-  gender?: string;
+  gender?: number;
 
   @ApiProperty()
   @IsPhoneNumber()

@@ -63,6 +63,21 @@ export class UserSeedService {
           },
         }),
       );
+      await this.repository.save(
+        this.repository.create({
+          fullName: 'Nguyen Thanh Nhan',
+          email: 'helend2905@gmail.com',
+          password: 'secret',
+          role: {
+            id: RoleEnum.user,
+            name: 'User',
+          },
+          status: {
+            id: StatusEnum.active,
+            name: 'Active',
+          },
+        }),
+      );
     }
   }
 }
