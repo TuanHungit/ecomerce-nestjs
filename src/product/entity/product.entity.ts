@@ -9,6 +9,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -50,10 +51,10 @@ export class Product extends EntityHelper {
   @JoinColumn()
   image: FileEntity | string;
 
-  // @OneToMany(() => FileEntity, (file) => file.product, {
-  //   eager: true,
-  // })
-  // images: FileEntity[] | string[];
+  @OneToMany(() => FileEntity, (file) => file.product, {
+    eager: true,
+  })
+  images: FileEntity[] | string[];
 
   @Column()
   likedCount?: number;
