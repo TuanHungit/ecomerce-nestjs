@@ -70,8 +70,9 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
   }
 
   async update(id: EntityId, data: any): Promise<T> {
-    await this.repository.update(id, data);
-    return this.repository.findOneById(id);
+    return await this.repository.save(
+      this.repository.create({ id, ...data }) as any,
+    );
   }
 
   async delete(id: EntityId): Promise<DeleteResult> {

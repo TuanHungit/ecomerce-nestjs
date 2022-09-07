@@ -13,6 +13,7 @@ import { Transform } from 'class-transformer';
 
 export class AuthUpdateDto {
   @ApiProperty({ example: 'admin@example.com' })
+  @IsOptional()
   @Transform(({ value }) => value.toLowerCase().trim())
   @Validate(IsNotExist, ['User'], {
     message: 'emailAlreadyExists',

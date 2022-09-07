@@ -10,9 +10,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { FileEntity } from './../../files/entities/file.entity';
+import { EntityHelper } from 'src/utils/entity-helper';
 
 @Entity()
-export class Brand {
+export class Brand extends EntityHelper {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

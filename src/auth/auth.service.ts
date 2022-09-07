@@ -294,7 +294,7 @@ export class AuthService {
         );
       }
     }
-
+    delete userDto.oldPassword;
     await this.usersService.update(user.id, userDto);
 
     return this.usersService.findOne({
