@@ -47,5 +47,5 @@ export class CreateBrandDto {
   @Validate(IsExist, ['Status', 'id'], {
     message: 'statusNotExists',
   })
-  status: Status;
+  status: Status | number;
 }

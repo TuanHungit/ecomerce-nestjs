@@ -43,7 +43,7 @@ export class Brand extends EntityHelper {
   @ManyToOne(() => FileEntity, {
     eager: true,
   })
-  status: Status;
+  status: Status | number;
 
   @BeforeInsert()
   @BeforeUpdate()
