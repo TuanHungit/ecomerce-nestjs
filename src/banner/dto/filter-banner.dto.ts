@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Status } from 'aws-sdk/clients/directconnect';
+import { ApiProperty } from '@nestjs/swagger';
+import { Status } from '../../statuses/entities/status.entity';
 import { IsOptional } from 'class-validator';
 
 export class FilterBannerDto {
@@ -7,10 +7,11 @@ export class FilterBannerDto {
   @IsOptional()
   title?: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     example:
       '1: main banner, 2: right banner, 3: simple big banner, 4: simple small banner, 5: left banner',
   })
+  @IsOptional()
   type?: number;
 
   @ApiProperty()

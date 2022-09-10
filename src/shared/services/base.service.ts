@@ -46,6 +46,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         }
       });
     }
+    console.log('wheres', wheres);
     return infinityPagination(
       await this.repository.find({
         skip: (paginationOptions.page - 1) * paginationOptions.limit,

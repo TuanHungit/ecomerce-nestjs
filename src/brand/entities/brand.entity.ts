@@ -24,12 +24,12 @@ export class Brand extends EntityHelper {
     eager: true,
   })
   @JoinColumn()
-  logo: FileEntity;
+  logo: FileEntity | string;
 
   @OneToOne(() => FileEntity, {
     eager: true,
   })
-  image: FileEntity;
+  image: FileEntity | string;
 
   @Column()
   description: string | null;
