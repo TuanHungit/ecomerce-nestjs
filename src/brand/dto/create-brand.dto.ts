@@ -23,7 +23,7 @@ export class CreateBrandDto {
   })
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'logoNotExists',
   })
   logo: string;
 

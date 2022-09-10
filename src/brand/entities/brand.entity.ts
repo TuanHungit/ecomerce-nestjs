@@ -1,32 +1,30 @@
-import { Status } from './../../statuses/entities/status.entity';
+import { EntityHelper } from 'src/utils/entity-helper';
 import {
+  AfterLoad,
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { FileEntity } from './../../files/entities/file.entity';
-import { EntityHelper } from 'src/utils/entity-helper';
+import { Status } from './../../statuses/entities/status.entity';
 
 @Entity()
 export class Brand extends EntityHelper {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column()
   name: string;
 
-  @OneToOne(() => FileEntity, {
+  @ManyToOne(() => FileEntity, {
     eager: true,
   })
-  @JoinColumn()
   logo: FileEntity | string;
 
-  @OneToOne(() => FileEntity, {
+  @ManyToOne(() => FileEntity, {
     eager: true,
   })
   image: FileEntity | string;
@@ -34,20 +32,21 @@ export class Brand extends EntityHelper {
   @Column()
   description: string | null;
 
-  @Column()
+  @Column('int', { default: 0 })
   totalProduct: number;
 
   @Column()
   slug: string;
 
-  @ManyToOne(() => FileEntity, {
+  @ManyToOne(() => Status, {
     eager: true,
   })
   status: Status | number;
 
   @BeforeInsert()
   @BeforeUpdate()
+  @AfterLoad()
   setSlug() {
-    this.slug = `${this.name.split(' ').join('_')}_${this.id}`;
+    this.slug = `${this.name.toLowerCase().split(' ').join('_')}_${this.id}`;
   }
 }

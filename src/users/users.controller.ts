@@ -46,8 +46,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   paging(
     @Body() filters: FliterUserDto,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
     @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
     @Query('column', new DefaultValuePipe('id')) column?: string,
     @Query('fields') fields?: string,

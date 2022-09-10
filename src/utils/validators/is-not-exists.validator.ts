@@ -22,6 +22,11 @@ export class IsNotExist implements ValidatorConstraintInterface {
   ) {}
 
   async validate(value: string, validationArguments: ValidationArguments) {
+    console.log(value, validationArguments);
+    // const property = !validationArguments.constraints[1]
+    //   ? validationArguments.property
+    //   : validationArguments.constraints[1];
+    //console.log(property);
     const repository = validationArguments.constraints[0] as string;
     const currentValue = validationArguments.object as ValidationEntity;
     const entity = (await this.dataSource.getRepository(repository).findOne({
@@ -29,7 +34,7 @@ export class IsNotExist implements ValidatorConstraintInterface {
         [validationArguments.property]: value,
       },
     })) as ValidationEntity;
-
+    console.log('entity', entity);
     if (entity?.id === currentValue?.id) {
       return true;
     }

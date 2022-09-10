@@ -13,6 +13,7 @@ import { EntityId } from 'typeorm/repository/EntityId';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class BaseService<T extends BaseEntity, R extends Repository<T>>
   implements IBaseService<T>
@@ -46,11 +47,14 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         }
       });
     }
-    console.log('wheres', wheres);
+    console.log('page', paginationOptions);
     return infinityPagination(
       await this.repository.find({
-        skip: (paginationOptions.page - 1) * paginationOptions.limit,
-        take: paginationOptions.limit,
+        ...(paginationOptions.page &&
+          paginationOptions.limit && {
+            skip: (paginationOptions.page - 1) * paginationOptions.limit,
+          }),
+        ...(paginationOptions.limit && { take: paginationOptions.limit }),
         select: selects,
         where: wheres,
         order: orders,
@@ -61,9 +65,26 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
   }
 
   async findOne(fields: EntityCondition<T>): Promise<T> {
-    return await this.repository.findOne({
+    const entity = await this.repository.findOne({
       where: fields,
     });
+
+    let error = 'with ';
+    Object.keys(fields).forEach((key) => {
+      error += `${key} = ${fields[key]}`;
+    });
+    if (!entity) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          errors: {
+            notFound: `Entity ${error} not found`,
+          },
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return entity;
   }
 
   async create(data: DeepPartial<T>): Promise<T> {
@@ -71,9 +92,22 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
   }
 
   async update(id: EntityId, data: any): Promise<T> {
-    return await this.repository.save(
-      this.repository.create({ id, ...data }) as any,
-    );
+    try {
+      await this.repository.save(
+        this.repository.create({ id, ...data }) as any,
+      );
+      return this.findOne({ id } as unknown as EntityCondition<T>);
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          errors: {
+            notFound: `Entity with id ${id} not found`,
+          },
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   async delete(id: EntityId): Promise<DeleteResult> {

@@ -39,8 +39,8 @@ export class BannerController {
   @HttpCode(HttpStatus.OK)
   paging(
     @Body() filters: FilterBannerDto,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
     @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
     @Query('column', new DefaultValuePipe('id')) column?: string,
     @Query('fields') fields?: string,

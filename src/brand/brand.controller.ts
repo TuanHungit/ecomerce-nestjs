@@ -1,16 +1,16 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
+  DefaultValuePipe,
   Delete,
-  Query,
+  Get,
   HttpCode,
   HttpStatus,
-  DefaultValuePipe,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
 import { BrandService } from './brand.service';
@@ -25,6 +25,7 @@ export class BrandController {
 
   @Post()
   create(@Body() createBrandDto: CreateBrandDto) {
+    console.log(createBrandDto);
     return this.brandService.create(createBrandDto);
   }
 
@@ -32,8 +33,8 @@ export class BrandController {
   @HttpCode(HttpStatus.OK)
   paging(
     @Body() filters: FilterBrandDto,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
     @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
     @Query('column', new DefaultValuePipe('id')) column?: string,
     @Query('fields') fields?: string,
