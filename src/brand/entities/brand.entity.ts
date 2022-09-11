@@ -1,11 +1,15 @@
+import { Categories } from 'src/categories/entity/categories.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
-  AfterLoad,
-  BeforeInsert,
+  AfterInsert,
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { FileEntity } from './../../files/entities/file.entity';
@@ -22,31 +26,36 @@ export class Brand extends EntityHelper {
   @ManyToOne(() => FileEntity, {
     eager: true,
   })
+  @JoinColumn()
   logo: FileEntity | string;
 
-  @ManyToOne(() => FileEntity, {
+  @OneToOne(() => FileEntity, {
     eager: true,
   })
+  @JoinColumn()
   image: FileEntity | string;
 
+  @ManyToMany(() => Categories)
+  @JoinTable({ name: 'brands_categories' })
+  categories: Categories[] | string[];
+
   @Column()
-  description: string | null;
+  description?: string | null;
 
   @Column('int', { default: 0 })
   totalProduct: number;
 
-  @Column()
-  slug: string;
+  @Column({ nullable: true })
+  slug?: string;
 
   @ManyToOne(() => Status, {
     eager: true,
   })
   status: Status | number;
 
-  @BeforeInsert()
+  @AfterInsert()
   @BeforeUpdate()
-  @AfterLoad()
   setSlug() {
-    this.slug = `${this.name.toLowerCase().split(' ').join('_')}_${this.id}`;
+    this.slug = `${this.name?.split(' ').join('_')}_${this.id}`.toLowerCase();
   }
 }

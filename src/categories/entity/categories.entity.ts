@@ -1,14 +1,14 @@
-import { EntityHelper } from './../../utils/entity-helper';
-import { Status } from './../../statuses/entities/status.entity';
-import { FileEntity } from './../../files/entities/file.entity';
 import {
-  BeforeInsert,
+  AfterInsert,
   BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { FileEntity } from './../../files/entities/file.entity';
+import { Status } from './../../statuses/entities/status.entity';
+import { EntityHelper } from './../../utils/entity-helper';
 
 @Entity()
 export class Categories extends EntityHelper {
@@ -26,14 +26,14 @@ export class Categories extends EntityHelper {
   @ManyToOne(() => Status, {
     eager: true,
   })
-  status: Status | string;
+  status: Status | number;
 
-  @Column()
+  @Column({ nullable: true })
   slug: string;
 
-  @BeforeInsert()
+  @AfterInsert()
   @BeforeUpdate()
   setSlug() {
-    this.slug = `${this.name.split(' ').join('_')}_${this.id}`;
+    this.slug = `${this.name?.split(' ').join('_')}_${this.id}`.toLowerCase();
   }
 }

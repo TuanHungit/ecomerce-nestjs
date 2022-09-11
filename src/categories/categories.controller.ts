@@ -14,29 +14,28 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
-import { BrandService } from './brand.service';
-import { CreateBrandDto } from './dto/create-brand.dto';
-import { FilterBrandDto } from './dto/filter-brand.dto';
-import { UpdateBrandDto } from './dto/update-brand.dto';
-import { Brand } from './entities/brand.entity';
-
-@ApiTags('Brands')
+import { CategoriesService } from './categories.service';
+import { CreateCategoriesDto } from './dto/create-categories.dto';
+import { FilterCategoriesDto } from './dto/filter-categories.dto';
+import { UpdateCategoriesDto } from './dto/update-categories.dto';
+import { Categories } from './entity/categories.entity';
+@ApiTags('Categories')
 @Controller({
   version: '1',
-  path: 'brands',
+  path: 'categories',
 })
-export class BrandController {
-  constructor(private readonly brandService: BrandService) {}
+export class CategoriesController {
+  constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  create(@Body() createBrandDto: CreateBrandDto) {
-    return this.brandService.create(createBrandDto);
+  create(@Body() createCategoriesDto: CreateCategoriesDto) {
+    return this.categoriesService.create(createCategoriesDto);
   }
 
   @Post('paging')
   @HttpCode(HttpStatus.OK)
   paging(
-    @Body() filters: FilterBrandDto,
+    @Body() filters: FilterCategoriesDto,
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
     @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
@@ -46,13 +45,13 @@ export class BrandController {
     if (limit > 50) {
       limit = 50;
     }
-    return this.brandService.findManyWithPagination(
+    return this.categoriesService.findManyWithPagination(
       {
         page,
         limit,
       },
       fields,
-      { ...filters } as EntityCondition<Brand>,
+      { ...filters } as EntityCondition<Categories>,
       { [column]: sort },
       ['name'],
     );
@@ -61,17 +60,20 @@ export class BrandController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
-    return this.brandService.findOne({ id });
+    return this.categoriesService.findOne({ id });
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  update(@Param('id') id: number, @Body() updateBannerDto: UpdateBrandDto) {
-    return this.brandService.update(id, updateBannerDto);
+  update(
+    @Param('id') id: number,
+    @Body() updateCategoriesDto: UpdateCategoriesDto,
+  ) {
+    return this.categoriesService.update(id, updateCategoriesDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: number) {
-    return this.brandService.delete(id);
+    return this.categoriesService.delete(id);
   }
 }

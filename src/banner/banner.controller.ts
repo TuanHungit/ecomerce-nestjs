@@ -31,7 +31,6 @@ export class BannerController {
   @Post()
   @HttpCode(HttpStatus.OK)
   create(@Body() banner: CreateBannerDto) {
-    console.log(banner);
     return this.bannerService.create(banner);
   }
 

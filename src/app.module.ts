@@ -9,8 +9,6 @@ import mailConfig from './config/mail.config';
 import fileConfig from './config/file.config';
 import facebookConfig from './config/facebook.config';
 import googleConfig from './config/google.config';
-import twitterConfig from './config/twitter.config';
-import appleConfig from './config/apple.config';
 import * as path from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -28,6 +26,7 @@ import { DataSource } from 'typeorm';
 import { BannerModule } from './banner/banner.module';
 import { SharedModule } from './shared/shared.module';
 import { BrandModule } from './brand/brand.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -41,8 +40,6 @@ import { BrandModule } from './brand/brand.module';
         fileConfig,
         facebookConfig,
         googleConfig,
-        twitterConfig,
-        appleConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -84,6 +81,7 @@ import { BrandModule } from './brand/brand.module';
     BannerModule,
     SharedModule,
     BrandModule,
+    CategoriesModule,
   ],
 })
 export class AppModule {}

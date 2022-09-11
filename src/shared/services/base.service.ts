@@ -47,7 +47,6 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         }
       });
     }
-    console.log('page', paginationOptions);
     return infinityPagination(
       await this.repository.find({
         ...(paginationOptions.page &&
@@ -78,7 +77,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         {
           status: HttpStatus.NOT_FOUND,
           errors: {
-            notFound: `Entity ${error} not found`,
+            message: `Entity ${error} not found`,
           },
         },
         HttpStatus.NOT_FOUND,
@@ -102,7 +101,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         {
           status: HttpStatus.NOT_FOUND,
           errors: {
-            notFound: `Entity with id ${id} not found`,
+            message: `Entity with id ${id} not found`,
           },
         },
         HttpStatus.NOT_FOUND,

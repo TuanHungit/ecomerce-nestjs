@@ -6,12 +6,7 @@ import { DataSource } from 'typeorm';
 import { ValidationArguments } from 'class-validator/types/validation/ValidationArguments';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-
-type ValidationEntity =
-  | {
-      id?: number | string;
-    }
-  | undefined;
+import { ValidationEntity } from '../types/validation-entity.type';
 
 @Injectable()
 @ValidatorConstraint({ name: 'IsNotExist', async: true })
@@ -22,11 +17,6 @@ export class IsNotExist implements ValidatorConstraintInterface {
   ) {}
 
   async validate(value: string, validationArguments: ValidationArguments) {
-    console.log(value, validationArguments);
-    // const property = !validationArguments.constraints[1]
-    //   ? validationArguments.property
-    //   : validationArguments.constraints[1];
-    //console.log(property);
     const repository = validationArguments.constraints[0] as string;
     const currentValue = validationArguments.object as ValidationEntity;
     const entity = (await this.dataSource.getRepository(repository).findOne({
@@ -34,7 +24,6 @@ export class IsNotExist implements ValidatorConstraintInterface {
         [validationArguments.property]: value,
       },
     })) as ValidationEntity;
-    console.log('entity', entity);
     if (entity?.id === currentValue?.id) {
       return true;
     }
