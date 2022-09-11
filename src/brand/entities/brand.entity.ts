@@ -35,9 +35,20 @@ export class Brand extends EntityHelper {
   @JoinColumn()
   image: FileEntity | string;
 
-  @ManyToMany(() => Categories)
-  @JoinTable({ name: 'brands_categories' })
-  categories: Categories[] | string[];
+  // @OneToMany(() => BrandsCategories, (bc) => bc.brand, {
+  //   cascade: ['insert'],
+  // })
+  // brandsCategories: BrandsCategories[] | number[];
+
+  @ManyToMany(() => Categories, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'brands_categories',
+    joinColumn: { name: 'brandId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'categoriesId', referencedColumnName: 'id' },
+  })
+  categories: Categories[] | number[];
 
   @Column()
   description?: string | null;

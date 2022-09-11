@@ -12,7 +12,7 @@ import { EntityHelper } from './../../utils/entity-helper';
 
 @Entity()
 export class Categories extends EntityHelper {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column()
@@ -22,6 +22,11 @@ export class Categories extends EntityHelper {
     eager: true,
   })
   logo: FileEntity | string;
+
+  // @OneToMany(() => BrandsCategories, (bc) => bc.categories, {
+  //   cascade: true,
+  // })
+  // brandsCategories: BrandsCategories[] | number[];
 
   @ManyToOne(() => Status, {
     eager: true,

@@ -30,6 +30,7 @@ export class BrandController {
 
   @Post()
   create(@Body() createBrandDto: CreateBrandDto) {
+    console.log(createBrandDto);
     return this.brandService.create(createBrandDto);
   }
 
@@ -37,8 +38,8 @@ export class BrandController {
   @HttpCode(HttpStatus.OK)
   paging(
     @Body() filters: FilterBrandDto,
-    @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
     @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
     @Query('column', new DefaultValuePipe('id')) column?: string,
     @Query('fields') fields?: string,

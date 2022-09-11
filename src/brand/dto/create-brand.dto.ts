@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Status } from 'src/statuses/entities/status.entity';
 import {
   IsNotEmpty,
   IsNumber,
@@ -7,6 +6,7 @@ import {
   IsUUID,
   Validate,
 } from 'class-validator';
+import { Status } from 'src/statuses/entities/status.entity';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 import { IsNotExist } from 'src/utils/validators/is-not-exists.validator';
 import { IsNotExistSub } from 'src/utils/validators/is-not-exsist-sub.validator';
@@ -42,6 +42,10 @@ export class CreateBrandDto {
     message: 'This image is already use for another brand',
   })
   image: string;
+
+  @ApiProperty()
+  @IsOptional()
+  categories: number[];
 
   @ApiProperty()
   @IsOptional()

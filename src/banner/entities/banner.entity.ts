@@ -1,15 +1,15 @@
+import { FileEntity } from 'src/files/entities/file.entity';
+import { Status } from 'src/statuses/entities/status.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
+  Entity,
   ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { Status } from 'src/statuses/entities/status.entity';
-import { FileEntity } from 'src/files/entities/file.entity';
 
 @Entity({ name: 'banner' })
 export class Banner extends EntityHelper {
@@ -32,6 +32,9 @@ export class Banner extends EntityHelper {
     eager: true,
   })
   photo?: FileEntity | string;
+
+  // @ManyToOne(() => BrandsCategories, (bc) => bc.banners)
+  // brandsCategories: BrandsCategories | number;
 
   @ManyToOne(() => Status, {
     eager: true,
