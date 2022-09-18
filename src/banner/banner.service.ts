@@ -10,7 +10,7 @@ export class BannerService extends BaseService<Banner, Repository<Banner>> {
     @InjectRepository(Banner)
     private bannerRepository: Repository<Banner>,
   ) {
-    super(bannerRepository);
+    super(bannerRepository, 'banner');
   }
 
   async create(data: DeepPartial<Banner>): Promise<Banner> {

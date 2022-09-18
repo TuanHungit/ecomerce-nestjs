@@ -19,9 +19,12 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
   implements IBaseService<T>
 {
   protected readonly repository: R;
+  private TName: string;
 
-  constructor(repository: R) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  constructor(repository: R, name: string) {
     this.repository = repository;
+    this.TName = name;
   }
 
   async findManyWithPagination(
@@ -66,6 +69,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
   async findOne(fields: EntityCondition<T>): Promise<T> {
     const entity = await this.repository.findOne({
       where: fields,
+      loadEagerRelations: true,
     });
 
     let error = 'with ';
@@ -77,7 +81,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         {
           status: HttpStatus.NOT_FOUND,
           errors: {
-            message: `Entity ${error} not found`,
+            message: `Entity ${this.TName} ${error} not found`,
           },
         },
         HttpStatus.NOT_FOUND,

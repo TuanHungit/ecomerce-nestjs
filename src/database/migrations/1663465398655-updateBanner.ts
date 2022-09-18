@@ -1,9 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class createBrandsCategories31662902150457
-  implements MigrationInterface
-{
-  name = 'createBrandsCategories31662902150457';
+export class updateBanner1663465398655 implements MigrationInterface {
+  name = 'updateBanner1663465398655';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -13,10 +11,10 @@ export class createBrandsCategories31662902150457
       `ALTER TABLE "brands_categories" DROP CONSTRAINT "FK_5198460192ebbd084ffbb5aebd7"`,
     );
     await queryRunner.query(
-      `DROP INDEX "public"."IDX_207eadbaa38ce8cf4625642519"`,
+      `DROP INDEX "public"."IDX_5198460192ebbd084ffbb5aebd"`,
     );
     await queryRunner.query(
-      `DROP INDEX "public"."IDX_5198460192ebbd084ffbb5aebd"`,
+      `DROP INDEX "public"."IDX_207eadbaa38ce8cf4625642519"`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_5198460192ebbd084ffbb5aebd" ON "brands_categories" ("brandId") `,
@@ -46,10 +44,10 @@ export class createBrandsCategories31662902150457
       `DROP INDEX "public"."IDX_5198460192ebbd084ffbb5aebd"`,
     );
     await queryRunner.query(
-      `CREATE INDEX "IDX_5198460192ebbd084ffbb5aebd" ON "brands_categories" ("brandId") `,
+      `CREATE INDEX "IDX_207eadbaa38ce8cf4625642519" ON "brands_categories" ("categoriesId") `,
     );
     await queryRunner.query(
-      `CREATE INDEX "IDX_207eadbaa38ce8cf4625642519" ON "brands_categories" ("categoriesId") `,
+      `CREATE INDEX "IDX_5198460192ebbd084ffbb5aebd" ON "brands_categories" ("brandId") `,
     );
     await queryRunner.query(
       `ALTER TABLE "brands_categories" ADD CONSTRAINT "FK_5198460192ebbd084ffbb5aebd7" FOREIGN KEY ("brandId") REFERENCES "brand"("id") ON DELETE CASCADE ON UPDATE CASCADE`,

@@ -33,9 +33,6 @@ export class Banner extends EntityHelper {
   })
   photo?: FileEntity | string;
 
-  // @ManyToOne(() => BrandsCategories, (bc) => bc.banners)
-  // brandsCategories: BrandsCategories | number;
-
   @ManyToOne(() => Status, {
     eager: true,
   })

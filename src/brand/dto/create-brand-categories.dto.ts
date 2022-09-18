@@ -1,9 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, Validate } from 'class-validator';
+import { IsExist } from 'src/utils/validators/is-exists.validator';
 
 export class BrandCategoriesDto {
   @ApiProperty()
-  banners: number[];
+  @IsOptional()
+  bannerIds?: number[];
 
   @ApiProperty()
-  categories: number;
+  @IsOptional()
+  @Validate(IsExist, ['Categories', 'id'], {
+    message: 'categoriesNotExists',
+  })
+  categoriesId?: number;
 }

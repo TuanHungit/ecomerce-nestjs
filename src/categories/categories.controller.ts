@@ -29,15 +29,15 @@ export class CategoriesController {
 
   @Post()
   create(@Body() createCategoriesDto: CreateCategoriesDto) {
-    return this.categoriesService.create(createCategoriesDto);
+    return this.categoriesService.createWithBanners(createCategoriesDto);
   }
 
   @Post('paging')
   @HttpCode(HttpStatus.OK)
   paging(
     @Body() filters: FilterCategoriesDto,
-    @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
     @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
     @Query('column', new DefaultValuePipe('id')) column?: string,
     @Query('fields') fields?: string,
@@ -69,7 +69,7 @@ export class CategoriesController {
     @Param('id') id: number,
     @Body() updateCategoriesDto: UpdateCategoriesDto,
   ) {
-    return this.categoriesService.update(id, updateCategoriesDto);
+    return this.categoriesService.updateWithBanners(id, updateCategoriesDto);
   }
 
   @Delete(':id')

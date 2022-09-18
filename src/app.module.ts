@@ -27,6 +27,7 @@ import { BannerModule } from './banner/banner.module';
 import { SharedModule } from './shared/shared.module';
 import { BrandModule } from './brand/brand.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { CategoriesModule } from './categories/categories.module';
     SharedModule,
     BrandModule,
     CategoriesModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

@@ -10,5 +10,6 @@ import { Banner } from './entities/banner.entity';
   imports: [TypeOrmModule.forFeature([Banner])],
   controllers: [BannerController],
   providers: [IsExist, IsNotExist, BannerService],
+  exports: [BannerService],
 })
 export class BannerModule {}

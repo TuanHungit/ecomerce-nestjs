@@ -10,11 +10,6 @@ export class BrandsCategories {
   @PrimaryColumn({ type: 'int' })
   categoriesId?: number;
 
-  // @OneToMany(() => Banner, (banner) => banner.brandsCategories, {
-  //   cascade: true,
-  // })
-  // banners: Banner[] | number[];
-
   @OneToOne(() => Brand)
   @JoinTable()
   brand: Brand | number;
@@ -22,4 +17,7 @@ export class BrandsCategories {
   @OneToOne(() => Categories)
   @JoinTable()
   categories: Categories | number;
+
+  // @Column({ default: 0 })
+  // totalProduct?: number;
 }

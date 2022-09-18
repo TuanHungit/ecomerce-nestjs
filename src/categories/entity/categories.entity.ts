@@ -1,8 +1,11 @@
+import { Banner } from 'src/banner/entities/banner.entity';
 import {
   AfterInsert,
   BeforeUpdate,
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -23,10 +26,14 @@ export class Categories extends EntityHelper {
   })
   logo: FileEntity | string;
 
-  // @OneToMany(() => BrandsCategories, (bc) => bc.categories, {
-  //   cascade: true,
-  // })
-  // brandsCategories: BrandsCategories[] | number[];
+  @ManyToMany(() => Banner, {
+    cascade: true,
+    eager: true,
+  })
+  @JoinTable({
+    name: 'categories_banners',
+  })
+  banners: Banner[] | number[];
 
   @ManyToOne(() => Status, {
     eager: true,

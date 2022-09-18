@@ -1,22 +1,23 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class createBrandsCategories21662901782616
-  implements MigrationInterface
-{
-  name = 'createBrandsCategories21662901782616';
+export class update21663514546847 implements MigrationInterface {
+  name = 'update21663514546847';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "brands_categories" DROP CONSTRAINT "FK_5198460192ebbd084ffbb5aebd7"`,
+      `ALTER TABLE "brands_categories" DROP CONSTRAINT "FK_207eadbaa38ce8cf46256425195"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "brands_categories" DROP CONSTRAINT "FK_207eadbaa38ce8cf46256425195"`,
+      `ALTER TABLE "brands_categories" DROP CONSTRAINT "FK_5198460192ebbd084ffbb5aebd7"`,
     );
     await queryRunner.query(
       `DROP INDEX "public"."IDX_5198460192ebbd084ffbb5aebd"`,
     );
     await queryRunner.query(
       `DROP INDEX "public"."IDX_207eadbaa38ce8cf4625642519"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "product" ALTER COLUMN "keywords" DROP NOT NULL`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_5198460192ebbd084ffbb5aebd" ON "brands_categories" ("brandId") `,
@@ -46,16 +47,19 @@ export class createBrandsCategories21662901782616
       `DROP INDEX "public"."IDX_5198460192ebbd084ffbb5aebd"`,
     );
     await queryRunner.query(
+      `ALTER TABLE "product" ALTER COLUMN "keywords" SET NOT NULL`,
+    );
+    await queryRunner.query(
       `CREATE INDEX "IDX_207eadbaa38ce8cf4625642519" ON "brands_categories" ("categoriesId") `,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_5198460192ebbd084ffbb5aebd" ON "brands_categories" ("brandId") `,
     );
     await queryRunner.query(
-      `ALTER TABLE "brands_categories" ADD CONSTRAINT "FK_207eadbaa38ce8cf46256425195" FOREIGN KEY ("categoriesId") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
+      `ALTER TABLE "brands_categories" ADD CONSTRAINT "FK_5198460192ebbd084ffbb5aebd7" FOREIGN KEY ("brandId") REFERENCES "brand"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
     );
     await queryRunner.query(
-      `ALTER TABLE "brands_categories" ADD CONSTRAINT "FK_5198460192ebbd084ffbb5aebd7" FOREIGN KEY ("brandId") REFERENCES "brand"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
+      `ALTER TABLE "brands_categories" ADD CONSTRAINT "FK_207eadbaa38ce8cf46256425195" FOREIGN KEY ("categoriesId") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
     );
   }
 }

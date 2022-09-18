@@ -1,6 +1,9 @@
-import { FileEntity } from './../../files/entities/file.entity';
-import { EntityHelper } from './../../utils/entity-helper';
+import { ApiProperty } from '@nestjs/swagger';
+import { Categories } from 'src/categories/entity/categories.entity';
+import { TierModel } from 'src/model/entities/tier-model.entity';
+import { Status } from 'src/statuses/entities/status.entity';
 import {
+  AfterInsert,
   BeforeInsert,
   BeforeUpdate,
   Column,
@@ -14,16 +17,16 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Status } from 'src/statuses/entities/status.entity';
-import { Categories } from 'src/categories/entity/categories.entity';
-import { TierModel } from 'src/model/entities/tier-model.entity';
+import { FileEntity } from './../../files/entities/file.entity';
+import { EntityHelper } from './../../utils/entity-helper';
 
 @Entity()
 export class Product extends EntityHelper {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @ApiProperty({ example: 1 })
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @BeforeInsert()
+  @AfterInsert()
   @BeforeUpdate()
   setSlug() {
     this.slug = `${this.name.split(' ').join('_')}_${this.id}`;
@@ -39,69 +42,87 @@ export class Product extends EntityHelper {
     }
   }
 
+  @ApiProperty()
   @Column()
   name: string;
 
+  @ApiProperty()
   @Column()
   description: string;
 
+  @ApiProperty()
   @OneToOne(() => FileEntity, {
     eager: true,
   })
   @JoinColumn()
   image: FileEntity | string;
 
+  @ApiProperty()
   @OneToMany(() => FileEntity, (file) => file.product, {
     eager: true,
   })
   images: FileEntity[] | string[];
 
-  @Column()
+  @ApiProperty()
+  @Column({ default: 0 })
   likedCount?: number;
 
+  @ApiProperty()
   @Column()
   discount?: number | null;
 
-  @Column()
+  @ApiProperty()
+  @Column({ default: 0 })
   stock?: number;
 
+  @ApiProperty()
   @Column()
-  price: number;
+  price?: number;
 
+  @ApiProperty()
   @Column()
-  priceBeforeDiscount?: number | null;
+  priceBeforeDiscount: number | null;
 
-  @Column()
+  @ApiProperty()
+  @Column({ default: 0 })
   sold?: number | null;
 
+  @ApiProperty()
   @ManyToOne(() => Status, {
     eager: true,
   })
-  status?: Status;
+  status?: Status | number;
 
+  @ApiProperty()
   @ManyToOne(() => Categories, {
     eager: true,
   })
-  categories: Categories;
+  categories: Categories | number;
 
+  @ApiProperty()
   @OneToOne(() => TierModel, {
     eager: true,
   })
   @JoinColumn()
-  tierModel?: TierModel | null;
+  tierModel?: TierModel | number;
 
-  @Column('text', { array: true })
-  keywords: string[] | null;
+  @ApiProperty()
+  @Column('text', { array: true, nullable: true })
+  keywords?: string[] | null;
 
+  @ApiProperty()
   @Column()
-  slug: string;
+  slug?: string;
 
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @ApiProperty()
   @DeleteDateColumn()
   deletedAt: Date;
 }

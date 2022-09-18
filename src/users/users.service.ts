@@ -10,7 +10,7 @@ export class UsersService extends BaseService<User, Repository<User>> {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {
-    super(usersRepository);
+    super(usersRepository, 'user');
   }
 
   async softDelete(id: number): Promise<void> {

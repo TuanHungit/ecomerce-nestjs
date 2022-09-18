@@ -33,9 +33,7 @@ export class Model extends EntityHelper {
   @Column()
   image?: string;
 
-  @ManyToOne(() => TierModel, {
-    eager: true,
-  })
+  @ManyToOne(() => TierModel, (tm) => tm.models)
   tierModel: TierModel;
 
   @CreateDateColumn()
