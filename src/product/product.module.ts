@@ -1,12 +1,21 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BannerModule } from 'src/banner/banner.module';
+import { FilesModule } from 'src/files/files.module';
+import { ModelModule } from 'src/model/model.module';
+import { TierModelModule } from 'src/tier-model/tier-model.module';
+import { Product } from './entity/product.entity';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { Product } from './entity/product.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product]), BannerModule],
+  imports: [
+    TypeOrmModule.forFeature([Product]),
+    BannerModule,
+    TierModelModule,
+    ModelModule,
+    FilesModule,
+  ],
   controllers: [ProductController],
   providers: [ProductService],
   exports: [ProductService],

@@ -28,6 +28,8 @@ import { SharedModule } from './shared/shared.module';
 import { BrandModule } from './brand/brand.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductModule } from './product/product.module';
+import { ModelModule } from './model/model.module';
+import { TierModelModule } from './tier-model/tier-model.module';
 
 @Module({
   imports: [
@@ -84,6 +86,8 @@ import { ProductModule } from './product/product.module';
     BrandModule,
     CategoriesModule,
     ProductModule,
+    ModelModule,
+    TierModelModule,
   ],
 })
 export class AppModule {}

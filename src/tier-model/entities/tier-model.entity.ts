@@ -5,13 +5,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Model } from './model.entity';
 
 @Entity()
 export class TierModel extends EntityHelper {
@@ -25,12 +22,6 @@ export class TierModel extends EntityHelper {
     eager: true,
   })
   status: Status;
-
-  @OneToMany(() => Model, (model) => model.tierModel, {
-    eager: true,
-  })
-  @JoinColumn()
-  models: Model[] | string[];
 
   @CreateDateColumn()
   createdAt: Date;

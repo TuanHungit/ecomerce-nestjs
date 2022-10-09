@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Categories } from 'src/categories/entity/categories.entity';
-import { TierModel } from 'src/model/entities/tier-model.entity';
+import { Model } from 'src/model/entities/model.entity';
 import { Status } from 'src/statuses/entities/status.entity';
+import { TierModel } from 'src/tier-model/entities/tier-model.entity';
 import {
-  AfterInsert,
   BeforeInsert,
   BeforeUpdate,
   Column,
@@ -11,9 +11,10 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -26,10 +27,10 @@ export class Product extends EntityHelper {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @AfterInsert()
+  @BeforeInsert()
   @BeforeUpdate()
   setSlug() {
-    this.slug = `${this.name.split(' ').join('_')}_${this.id}`;
+    this.slug = `${this.name.split(' ').join('_')}`;
   }
 
   @BeforeInsert()
@@ -37,7 +38,7 @@ export class Product extends EntityHelper {
   setPrice() {
     if (this.discount) {
       this.price =
-        this.priceBeforeDiscount +
+        this.priceBeforeDiscount -
         Math.floor((this.priceBeforeDiscount * this.discount) / 100);
     }
   }
@@ -51,16 +52,15 @@ export class Product extends EntityHelper {
   description: string;
 
   @ApiProperty()
-  @OneToOne(() => FileEntity, {
+  @ManyToOne(() => FileEntity, {
     eager: true,
   })
   @JoinColumn()
   image: FileEntity | string;
 
   @ApiProperty()
-  @OneToMany(() => FileEntity, (file) => file.product, {
-    eager: true,
-  })
+  @ManyToMany(() => FileEntity)
+  @JoinTable()
   images: FileEntity[] | string[];
 
   @ApiProperty()
@@ -100,18 +100,24 @@ export class Product extends EntityHelper {
   categories: Categories | number;
 
   @ApiProperty()
-  @OneToOne(() => TierModel, {
+  @ManyToOne(() => TierModel, {
     eager: true,
   })
   @JoinColumn()
-  tierModel?: TierModel | number;
+  tierModel?: TierModel | string | number;
+
+  @OneToMany(() => Model, (model) => model.product, {
+    eager: true,
+  })
+  @JoinColumn()
+  models: Model[] | string[];
 
   @ApiProperty()
   @Column('text', { array: true, nullable: true })
   keywords?: string[] | null;
 
   @ApiProperty()
-  @Column()
+  @Column({ nullable: true })
   slug?: string;
 
   @ApiProperty()

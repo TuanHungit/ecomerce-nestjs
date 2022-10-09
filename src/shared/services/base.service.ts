@@ -50,6 +50,13 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         }
       });
     }
+    let totalPages = 1;
+    if (paginationOptions.limit) {
+      const totalRows = await this.repository.count({
+        where: wheres,
+      });
+      totalPages = Math.ceil(totalRows / paginationOptions.limit);
+    }
     return infinityPagination(
       await this.repository.find({
         ...(paginationOptions.page &&
@@ -62,6 +69,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         order: orders,
         cache: true,
       }),
+      totalPages,
       paginationOptions,
     );
   }

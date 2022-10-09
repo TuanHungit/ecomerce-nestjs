@@ -1,3 +1,5 @@
+import { Product } from 'src/product/entity/product.entity';
+import { Status } from 'src/statuses/entities/status.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
   Column,
@@ -8,7 +10,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { TierModel } from './tier-model.entity';
 
 @Entity()
 export class Model extends EntityHelper {
@@ -19,22 +20,27 @@ export class Model extends EntityHelper {
   name: string;
 
   @Column()
-  price: number;
+  price?: number;
 
   @Column()
-  priceBeforeDiscount?: number | null;
+  priceBeforeDiscount: number;
 
   @Column()
   stock: number;
 
-  @Column()
+  @Column({ default: 0 })
   sold?: number;
 
   @Column()
   image?: string;
 
-  @ManyToOne(() => TierModel, (tm) => tm.models)
-  tierModel: TierModel;
+  @ManyToOne(() => Product, (product) => product.models)
+  product?: Product;
+
+  @ManyToOne(() => Status, {
+    eager: true,
+  })
+  status?: Status;
 
   @CreateDateColumn()
   createdAt: Date;
