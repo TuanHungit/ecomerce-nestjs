@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileEntity } from './entities/file.entity';
 import { Repository } from 'typeorm';
 import { BaseService } from 'src/shared/services/base.service';
+import { FileType } from './file.constant';
+import { getVideoDuration } from 'src/utils/get-duration-video-file';
 
 @Injectable()
 export class FilesService extends BaseService<
@@ -19,6 +21,7 @@ export class FilesService extends BaseService<
   }
 
   async uploadFile(file): Promise<FileEntity> {
+    console.log(file);
     if (!file) {
       throw new HttpException(
         {
@@ -36,10 +39,21 @@ export class FilesService extends BaseService<
       s3: file.location,
     };
 
-    return this.fileRepository.save(
+    const fileEntity = await this.fileRepository.save(
       this.fileRepository.create({
         path: path[this.configService.get('file.driver')],
       }),
     );
+
+    const fileExtention = file.path.split('.').pop();
+    let type = FileType.IMAGE;
+    if (['mp4'].includes(fileExtention)) {
+      type = FileType.VIDEO;
+      const duration = await getVideoDuration(file.path);
+      fileEntity.duration = duration;
+    }
+    fileEntity.type = type;
+
+    return this.fileRepository.save(this.fileRepository.create(fileEntity));
   }
 }

@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import appConfig from '../../config/app.config';
+import { FileType } from '../file.constant';
 
 @Entity({ name: 'file' })
 export class FileEntity extends EntityHelper {
@@ -19,6 +20,12 @@ export class FileEntity extends EntityHelper {
   @Allow()
   @Column()
   path: string;
+
+  @Column({ nullable: true })
+  type: FileType;
+
+  @Column({ nullable: true })
+  duration: number;
 
   @AfterLoad()
   @AfterInsert()
