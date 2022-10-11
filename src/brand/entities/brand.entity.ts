@@ -1,7 +1,7 @@
 import { Categories } from 'src/categories/entity/categories.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
-  AfterInsert,
+  BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
@@ -64,9 +64,9 @@ export class Brand extends EntityHelper {
   })
   status: Status | number;
 
-  @AfterInsert()
+  @BeforeInsert()
   @BeforeUpdate()
   setSlug() {
-    this.slug = `${this.name?.split(' ').join('_')}_${this.id}`.toLowerCase();
+    this.slug = `${this.name.split(' ').join('_')}_${new Date().getTime()}`;
   }
 }

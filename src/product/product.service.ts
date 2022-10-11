@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { set } from 'lodash';
 import { FilesService } from 'src/files/files.service';
 import { CreateModelDto } from 'src/model/dto/create-model.dto';
 import { Model } from 'src/model/entities/model.entity';
@@ -8,8 +9,17 @@ import { BaseService } from 'src/shared/services/base.service';
 import { StatusEnum } from 'src/statuses/statuses.enum';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
 import { TierModelService } from 'src/tier-model/tier-model.service';
-import { Repository } from 'typeorm';
+import { infinityPagination } from 'src/utils/infinity-pagination';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import {
+  Between,
+  FindOptionsOrder,
+  FindOptionsWhere,
+  Like,
+  Repository,
+} from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 import { Product } from './entity/product.entity';
 
 @Injectable()
@@ -25,7 +35,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
   }
 
   async create(data: CreateProductDto): Promise<Product> {
-    console.log(data);
     // create tier-model
     const { tierModel, models } = data;
     const status = {
@@ -99,5 +108,94 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
 
     data.tierModel = tierModelEntity;
     return super.create(data);
+  }
+
+  filers(searchProductDto: SearchProductDto) {
+    return searchProductDto;
+  }
+
+  async searchHint(keyword: string): Promise<string[]> {
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .where('product.keywords ::text ILIKE ANY (ARRAY[:keyword::text])', {
+        keyword: `%${keyword}%`,
+      })
+      .andWhere({ status: StatusEnum.active })
+      .select('product.keywords')
+      .getMany();
+    if (!products) {
+      return [];
+    }
+    let keywords: string[] = [];
+    products.forEach((product) => {
+      if (keywords.length === 10) return;
+      keywords = [...new Set(keywords.concat(product.keywords))];
+    });
+
+    return keywords;
+  }
+
+  async searching(
+    searchProductDto: SearchProductDto,
+    paginationOptions: IPaginationOptions,
+    fields?: string,
+    wheres?: FindOptionsWhere<Product>,
+    orders?: FindOptionsOrder<Product>,
+    likes?: string[],
+  ) {
+    console.log('searchProductDto', searchProductDto);
+    const selects = [];
+    if (fields) {
+      fields.split(',').forEach((el) => {
+        if (el) {
+          selects.push(el);
+        }
+      });
+      selects.push('id');
+    }
+    if (likes) {
+      likes.forEach((el: string) => {
+        if (wheres[el]) {
+          wheres[el] = Like(`%${wheres[el]}%`);
+        }
+      });
+    }
+    if (searchProductDto.categories) {
+      set(wheres, 'categories', { id: searchProductDto.categories });
+    }
+    if (searchProductDto.brand) {
+      set(wheres, 'brand', { id: searchProductDto.brand });
+    }
+    if (searchProductDto.fromPrice && searchProductDto.toPrice) {
+      wheres.price = Between(
+        searchProductDto.fromPrice,
+        searchProductDto.toPrice,
+      );
+    }
+    console.log('wheres', wheres);
+    let totalPages = 1;
+    if (paginationOptions.limit) {
+      const totalRows = await this.repository.count({
+        where: wheres,
+      });
+      totalPages = Math.ceil(totalRows / paginationOptions.limit);
+    }
+    return infinityPagination(
+      await this.repository.find({
+        ...(paginationOptions.page &&
+          paginationOptions.limit && {
+            skip: (paginationOptions.page - 1) * paginationOptions.limit,
+          }),
+        ...(paginationOptions.limit && { take: paginationOptions.limit }),
+        select: selects,
+        where: wheres,
+        order: orders,
+        cache: true,
+        loadEagerRelations: false,
+        relations: ['categories'],
+      }),
+      totalPages,
+      paginationOptions,
+    );
   }
 }

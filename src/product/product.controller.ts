@@ -16,6 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entity/product.entity';
 import { ProductService } from './product.service';
@@ -53,6 +54,38 @@ export class ProductController {
       { [column]: sort },
       ['name'],
     );
+  }
+
+  @Post('searching')
+  @HttpCode(HttpStatus.OK)
+  searching(
+    @Body() searchProductDto: SearchProductDto,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
+    @Query('column', new DefaultValuePipe('id')) column?: string,
+    @Query('fields') fields?: string,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+    return this.productService.searching(
+      searchProductDto,
+      {
+        page,
+        limit,
+      },
+      fields,
+      {},
+      { [column]: sort },
+      ['name'],
+    );
+  }
+
+  @Get('search-hint')
+  @HttpCode(HttpStatus.OK)
+  async searchHint(@Query('keyword') keyword: string) {
+    return await this.productService.searchHint(keyword);
   }
 
   @Get(':id')

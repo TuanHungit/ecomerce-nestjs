@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Brand } from 'src/brand/entities/brand.entity';
 import { Categories } from 'src/categories/entity/categories.entity';
 import { Model } from 'src/model/entities/model.entity';
 import { Status } from 'src/statuses/entities/status.entity';
@@ -30,7 +31,7 @@ export class Product extends EntityHelper {
   @BeforeInsert()
   @BeforeUpdate()
   setSlug() {
-    this.slug = `${this.name.split(' ').join('_')}`;
+    this.slug = `${this.name.split(' ').join('_')}_${new Date().getTime()}`;
   }
 
   @BeforeInsert()
@@ -100,6 +101,12 @@ export class Product extends EntityHelper {
   categories: Categories | number;
 
   @ApiProperty()
+  @ManyToOne(() => Brand, {
+    eager: true,
+  })
+  brand: Brand | number;
+
+  @ApiProperty()
   @ManyToOne(() => TierModel, {
     eager: true,
   })
@@ -113,7 +120,7 @@ export class Product extends EntityHelper {
   models: Model[] | string[];
 
   @ApiProperty()
-  @Column('text', { array: true, nullable: true })
+  @Column('jsonb', { nullable: true })
   keywords?: string[] | null;
 
   @ApiProperty()

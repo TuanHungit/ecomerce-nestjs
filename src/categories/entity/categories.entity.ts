@@ -1,6 +1,6 @@
 import { Banner } from 'src/banner/entities/banner.entity';
 import {
-  AfterInsert,
+  BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
@@ -43,9 +43,9 @@ export class Categories extends EntityHelper {
   @Column({ nullable: true })
   slug: string;
 
-  @AfterInsert()
+  @BeforeInsert()
   @BeforeUpdate()
   setSlug() {
-    this.slug = `${this.name?.split(' ').join('_')}_${this.id}`.toLowerCase();
+    this.slug = `${this.name.split(' ').join('_')}_${new Date().getTime()}`;
   }
 }
