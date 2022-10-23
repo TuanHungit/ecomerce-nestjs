@@ -9,6 +9,7 @@ import { BaseService } from 'src/shared/services/base.service';
 import { StatusEnum } from 'src/statuses/statuses.enum';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
 import { TierModelService } from 'src/tier-model/tier-model.service';
+import { UsersService } from 'src/users/users.service';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import {
@@ -30,6 +31,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     private modelService: ModelService,
     private tierModelService: TierModelService,
     private fileService: FilesService,
+    private userService: UsersService,
   ) {
     super(productRepository, 'product');
   }
@@ -192,10 +194,58 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         order: orders,
         cache: true,
         loadEagerRelations: false,
-        relations: ['categories'],
+        relations: ['image'],
       }),
       totalPages,
       paginationOptions,
     );
+  }
+
+  async like(userId: number, productId: number) {
+    const user = await this.userService.findOne({ id: userId });
+    const product = await super.findOne({ id: productId }, ['likedUsers']);
+    if (!product.likedUsers) {
+      product.likedUsers = [];
+    }
+    if (product.likedUsers.find((user) => user.id === userId)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          errors: {
+            message: `You already like this product with id = ${productId}!`,
+          },
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    product.likedUsers = [...product.likedUsers, user];
+    product.likedCount += 1;
+    await this.productRepository.save(product);
+    return true;
+  }
+
+  async unlike(userId: number, productId: number) {
+    const user = await this.userService.findOne({ id: userId });
+    const product = await super.findOne({ id: productId }, ['likedUsers']);
+    if (!product.likedUsers) {
+      product.likedUsers = [];
+    }
+    if (!product.likedUsers.find((likeUser) => likeUser.id === user.id)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          errors: {
+            message: `You haven't liked this product with id = ${productId} yet!`,
+          },
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    product.likedUsers = product.likedUsers.filter(
+      (likeUser) => likeUser.id !== user.id,
+    );
+    product.likedCount -= 1;
+    await this.productRepository.save(product);
+    return true;
   }
 }

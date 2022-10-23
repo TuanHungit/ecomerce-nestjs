@@ -4,6 +4,7 @@ import { Categories } from 'src/categories/entity/categories.entity';
 import { Model } from 'src/model/entities/model.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -118,6 +119,12 @@ export class Product extends EntityHelper {
   })
   @JoinColumn()
   models: Model[] | string[];
+
+  @ManyToMany(() => User, { eager: true })
+  @JoinTable({
+    name: 'likes',
+  })
+  likedUsers: User[];
 
   @ApiProperty()
   @Column('jsonb', { nullable: true })

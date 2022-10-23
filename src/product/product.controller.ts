@@ -8,11 +8,15 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Request,
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { get } from 'lodash';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
@@ -103,5 +107,21 @@ export class ProductController {
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.productService.delete(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/like')
+  like(@Request() request, @Param('id') id: number) {
+    return this.productService.like(get(request, 'user.id'), id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/unlike')
+  unlike(@Request() request, @Param('id') id: number) {
+    return this.productService.unlike(get(request, 'user.id'), id);
   }
 }

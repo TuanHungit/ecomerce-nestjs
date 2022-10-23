@@ -74,10 +74,15 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     );
   }
 
-  async findOne(fields: EntityCondition<T>): Promise<T> {
+  async findOne(fields: EntityCondition<T>, relations?: string[]): Promise<T> {
     const entity = await this.repository.findOne({
       where: fields,
-      loadEagerRelations: true,
+      ...(!relations
+        ? { loadEagerRelations: true }
+        : {
+            loadEagerRelations: false,
+            relations,
+          }),
     });
 
     let error = 'with ';

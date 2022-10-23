@@ -30,6 +30,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductModule } from './product/product.module';
 import { ModelModule } from './model/model.module';
 import { TierModelModule } from './tier-model/tier-model.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { TierModelModule } from './tier-model/tier-model.module';
     ProductModule,
     ModelModule,
     TierModelModule,
+    StripeModule,
   ],
 })
 export class AppModule {}
