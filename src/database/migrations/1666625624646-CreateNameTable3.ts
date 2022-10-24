@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateNameTable11665837076800 implements MigrationInterface {
-  name = 'CreateNameTable11665837076800';
+export class CreateNameTable31666625624646 implements MigrationInterface {
+  name = 'CreateNameTable31666625624646';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -15,6 +15,9 @@ export class CreateNameTable11665837076800 implements MigrationInterface {
     );
     await queryRunner.query(
       `DROP INDEX "public"."IDX_207eadbaa38ce8cf4625642519"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "orders" ADD "address" character varying`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_5198460192ebbd084ffbb5aebd" ON "brands_categories" ("brandId") `,
@@ -43,6 +46,7 @@ export class CreateNameTable11665837076800 implements MigrationInterface {
     await queryRunner.query(
       `DROP INDEX "public"."IDX_5198460192ebbd084ffbb5aebd"`,
     );
+    await queryRunner.query(`ALTER TABLE "orders" DROP COLUMN "address"`);
     await queryRunner.query(
       `CREATE INDEX "IDX_207eadbaa38ce8cf4625642519" ON "brands_categories" ("categoriesId") `,
     );

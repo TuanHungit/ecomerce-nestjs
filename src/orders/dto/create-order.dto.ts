@@ -1,14 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, Validate } from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
-import { Entity } from 'typeorm';
 
-@Entity('orders')
-export class Orders {
-  @ApiProperty()
-  @IsNotEmpty()
-  amount: number;
-
+export class CreateOrderDto {
   @ApiProperty()
   @IsOptional()
   @IsNumber()
@@ -17,21 +11,16 @@ export class Orders {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  amountBeforeDiscount: number;
+  amount: number;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @Validate(IsExist, ['User', 'id'], {
-    message: 'userNotExists',
-  })
-  user: string;
+  userId: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsExist, ['Product', 'id'], {
     message: 'productNotExists',
   })
-  product: string;
+  productId: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -39,8 +28,12 @@ export class Orders {
   quantity: number;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   note: string;
+
+  @ApiProperty()
+  @IsOptional()
+  address: string;
 
   @ApiProperty()
   @IsNotEmpty()

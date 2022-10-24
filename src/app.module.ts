@@ -31,6 +31,7 @@ import { ProductModule } from './product/product.module';
 import { ModelModule } from './model/model.module';
 import { TierModelModule } from './tier-model/tier-model.module';
 import { StripeModule } from './stripe/stripe.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ import { StripeModule } from './stripe/stripe.module';
     ModelModule,
     TierModelModule,
     StripeModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}

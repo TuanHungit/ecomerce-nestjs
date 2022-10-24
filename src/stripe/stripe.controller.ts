@@ -1,7 +1,12 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { StripeService } from './stripe.service';
 
-@Controller('stripe')
+@ApiTags('Payments')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
+@Controller('payments/stripe')
 export class StripeController {
   constructor(private stripeService: StripeService) {}
 
