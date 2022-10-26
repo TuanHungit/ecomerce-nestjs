@@ -28,6 +28,7 @@ export class OrdersController {
   @Post()
   create(@Request() request, @Body() createOrderDto: CreateOrderDto) {
     createOrderDto.userId = request.user.id;
+    createOrderDto.updatedBy = request.user.email;
     return this.orderService.create(createOrderDto);
   }
 
@@ -56,7 +57,8 @@ export class OrdersController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: string) {
+  findOne(@Request() request, @Param('id') id: string) {
+    console.log('request', request);
     return this.orderService.findOne({ id: +id });
   }
 

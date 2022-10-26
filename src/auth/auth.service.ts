@@ -73,6 +73,7 @@ export class AuthService {
     if (isValidPassword) {
       const token = await this.jwtService.sign({
         id: user.id,
+        email: user.email,
         role: user.role,
       });
 

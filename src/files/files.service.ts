@@ -50,7 +50,7 @@ export class FilesService extends BaseService<
     if (['mp4'].includes(fileExtention)) {
       type = FileType.VIDEO;
       const duration = await getVideoDuration(file.path);
-      fileEntity.duration = duration;
+      fileEntity.duration = Math.floor(duration);
     }
     fileEntity.type = type;
 

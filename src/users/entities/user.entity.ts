@@ -1,22 +1,22 @@
+import * as bcrypt from 'bcryptjs';
+import { AuthProvidersEnum } from 'src/auth/auth-providers.enum';
+import { EntityHelper } from 'src/utils/entity-helper';
 import {
-  Column,
   AfterLoad,
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
-  BeforeInsert,
-  BeforeUpdate,
-  CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,
 } from 'typeorm';
+import { FileEntity } from '../../files/entities/file.entity';
 import { Role } from '../../roles/entities/role.entity';
 import { Status } from '../../statuses/entities/status.entity';
-import { FileEntity } from '../../files/entities/file.entity';
-import * as bcrypt from 'bcryptjs';
-import { EntityHelper } from 'src/utils/entity-helper';
-import { AuthProvidersEnum } from 'src/auth/auth-providers.enum';
 
 @Entity()
 export class User extends EntityHelper {

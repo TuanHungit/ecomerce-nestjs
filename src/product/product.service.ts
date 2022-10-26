@@ -5,6 +5,7 @@ import { FilesService } from 'src/files/files.service';
 import { CreateModelDto } from 'src/model/dto/create-model.dto';
 import { Model } from 'src/model/entities/model.entity';
 import { ModelService } from 'src/model/model.service';
+import { ReviewService } from 'src/review/review.service';
 import { BaseService } from 'src/shared/services/base.service';
 import { StatusEnum } from 'src/statuses/statuses.enum';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
@@ -32,6 +33,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     private tierModelService: TierModelService,
     private fileService: FilesService,
     private userService: UsersService,
+    private reviewService: ReviewService,
   ) {
     super(productRepository, 'product');
   }
@@ -112,6 +114,18 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     return super.create(data);
   }
 
+  async getOne(productId: number): Promise<Product> {
+    //* get product
+    const product = await super.findOne({ id: productId });
+
+    //* get review
+    const reviews = await this.reviewService.statisticsByRatingAndProduct(
+      productId,
+    );
+    console.log('reviews', reviews);
+    return product;
+  }
+
   filers(searchProductDto: SearchProductDto) {
     return searchProductDto;
   }
@@ -145,7 +159,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     orders?: FindOptionsOrder<Product>,
     likes?: string[],
   ) {
-    console.log('searchProductDto', searchProductDto);
     const selects = [];
     if (fields) {
       fields.split(',').forEach((el) => {
@@ -174,7 +187,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         searchProductDto.toPrice,
       );
     }
-    console.log('wheres', wheres);
     let totalPages = 1;
     if (paginationOptions.limit) {
       const totalRows = await this.repository.count({

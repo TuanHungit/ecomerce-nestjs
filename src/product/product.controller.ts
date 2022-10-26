@@ -94,8 +94,8 @@ export class ProductController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne({ id: +id });
+  findOne(@Param('id') id: number) {
+    return this.productService.getOne(id);
   }
 
   @Patch(':id')

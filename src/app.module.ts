@@ -32,6 +32,7 @@ import { ModelModule } from './model/model.module';
 import { TierModelModule } from './tier-model/tier-model.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OrdersModule } from './orders/orders.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { OrdersModule } from './orders/orders.module';
     TierModelModule,
     StripeModule,
     OrdersModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}

@@ -38,4 +38,6 @@ export class CreateOrderDto {
   @ApiProperty()
   @IsNotEmpty()
   paymentMethod: string;
+
+  updatedBy: string;
 }
