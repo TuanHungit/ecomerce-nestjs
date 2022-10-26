@@ -1,7 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilesService } from 'src/files/files.service';
 import { BaseService } from 'src/shared/services/base.service';
-import { StatusEnum } from 'src/statuses/statuses.enum';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { Review } from './entity/review.entity';
