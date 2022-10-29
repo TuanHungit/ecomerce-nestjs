@@ -41,7 +41,7 @@
     "@types/lodash": "^4.14.186",
     "apple-signin-auth": "1.7.4",
     "bcryptjs": "2.4.3",
-    "class-transformer": "0.5.1",
+    "class-transformer": "^0.5.1",
     "class-validator": "0.13.2",
     "fb": "2.0.0",
     "get-video-duration": "^4.1.0",

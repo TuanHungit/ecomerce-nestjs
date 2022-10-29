@@ -30,7 +30,7 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
     const reviews = await this.reviewRepository
       .createQueryBuilder('review')
       .select('COUNT(review.id)', 'totalReview')
-      .addSelect('review.rating')
+      .addSelect('review.rating', 'rating')
       .where({
         productId,
         // status: StatusEnum.active,

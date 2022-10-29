@@ -1,67 +1,17 @@
-import { Expose } from 'class-transformer';
-import { FileEntity } from 'src/files/entities/file.entity';
-import { Status } from 'src/statuses/entities/status.entity';
+import { Expose, Transform, Type } from 'class-transformer';
 
-export class ProductResponseDto {
+class FileResponse {
   @Expose()
   id: number;
 
   @Expose()
-  name: string;
+  path: string;
 
   @Expose()
-  description: string;
+  type: string;
 
   @Expose()
-  image: FileEntity;
-
-  @Expose()
-  images: FileEntity[];
-
-  @Expose()
-  likedCount?: number;
-
-  @Expose()
-  discount?: number;
-
-  @Expose()
-  stock?: number;
-
-  @Expose()
-  price?: number;
-
-  @Expose()
-  priceBeforeDiscount: number | null;
-
-  @Expose()
-  sold?: number | null;
-
-  @Expose()
-  status?: Status;
-
-  @Expose()
-  categories: CategoriesResponse;
-
-  @Expose()
-  brand: BrandResponse;
-
-  @Expose()
-  tierModel?: TierModelResponse;
-
-  @Expose()
-  keywords?: string[];
-
-  @Expose()
-  slug?: string;
-
-  @Expose()
-  createdAt: Date;
-
-  @Expose()
-  updatedAt: Date;
-
-  @Expose()
-  deletedAt: Date;
+  duration: number;
 }
 
 class CategoriesResponse {
@@ -72,7 +22,8 @@ class CategoriesResponse {
   name: string;
 
   @Expose()
-  logo: FileEntity;
+  @Type(() => FileResponse)
+  logo: FileResponse;
 }
 
 class BrandResponse {
@@ -83,18 +34,12 @@ class BrandResponse {
   name: string;
 
   @Expose()
-  logo: FileEntity;
+  @Type(() => FileResponse)
+  logo: FileResponse;
 
   @Expose()
-  image: FileEntity;
-}
-
-class TierModelResponse {
-  @Expose()
-  tierModelName: string;
-
-  @Expose()
-  models: ModelResponse;
+  @Type(() => FileResponse)
+  image: FileResponse;
 }
 
 class ModelResponse {
@@ -118,4 +63,94 @@ class ModelResponse {
 
   @Expose()
   image?: string;
+}
+class TierModelResponse {
+  @Expose()
+  @Transform(({ obj }) => obj.name)
+  name: string;
+
+  @Expose()
+  @Type(() => ModelResponse)
+  models: ModelResponse;
+}
+
+class StatisticReviewResponse {
+  @Expose()
+  rating: number;
+
+  @Expose()
+  totalReview: number;
+}
+export class ProductResponseDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  name: string;
+
+  @Expose()
+  description: string;
+
+  @Expose()
+  @Type(() => FileResponse)
+  image: FileResponse;
+
+  @Expose()
+  @Type(() => FileResponse)
+  images: FileResponse[];
+
+  @Expose()
+  likedCount?: number;
+
+  @Expose()
+  discount?: number;
+
+  @Expose()
+  stock?: number;
+
+  @Expose()
+  price?: number;
+
+  @Expose()
+  priceBeforeDiscount: number | null;
+
+  @Expose()
+  sold?: number | null;
+
+  @Expose()
+  ratingAvg: number;
+
+  @Expose()
+  @Type(() => CategoriesResponse)
+  categories: CategoriesResponse;
+
+  @Expose()
+  @Type(() => BrandResponse)
+  brand: BrandResponse;
+
+  @Expose()
+  @Type(() => TierModelResponse)
+  tierModel?: TierModelResponse;
+
+  @Expose()
+  keywords?: string[];
+
+  @Expose()
+  statisticReview: StatisticReviewResponse[];
+
+  @Expose()
+  slug?: string;
+
+  @Expose()
+  @Transform(({ obj }) => obj.status.name)
+  status?: string;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Expose()
+  deletedAt: Date;
 }

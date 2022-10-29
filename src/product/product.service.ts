@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 import { set } from 'lodash';
 import { FilesService } from 'src/files/files.service';
 import { CreateModelDto } from 'src/model/dto/create-model.dto';
@@ -11,6 +12,7 @@ import { StatusEnum } from 'src/statuses/statuses.enum';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
 import { TierModelService } from 'src/tier-model/tier-model.service';
 import { UsersService } from 'src/users/users.service';
+import { deepCloneObject } from 'src/utils/deep-clone-object';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import {
@@ -21,6 +23,7 @@ import {
   Repository,
 } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ProductResponseDto } from './dto/product-response.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { Product } from './entity/product.entity';
 
@@ -114,16 +117,38 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     return super.create(data);
   }
 
-  async getOne(productId: number): Promise<Product> {
+  async getOne(productId: number): Promise<ProductResponseDto> {
     //* get product
     const product = await super.findOne({ id: productId });
-
+    console.log('product', product);
     //* get review
     const reviews = await this.reviewService.statisticsByRatingAndProduct(
       productId,
     );
-    console.log('reviews', reviews);
-    return product;
+
+    const ratingAvg =
+      reviews?.reduce((prev, cur) => {
+        return prev + cur.rating * +cur.totalReview;
+      }, 0) /
+      reviews?.reduce((prev, cur) => {
+        return prev + +cur.totalReview;
+      }, 0);
+
+    return plainToClass(
+      ProductResponseDto,
+      {
+        ...product,
+        ratingAvg: Math.round(ratingAvg * 10) / 10,
+        statisticReview: reviews,
+        tierModel: {
+          ...deepCloneObject(product.tierModel),
+          models: product.models,
+        },
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
   filers(searchProductDto: SearchProductDto) {
