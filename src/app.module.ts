@@ -30,9 +30,11 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductModule } from './product/product.module';
 import { ModelModule } from './model/model.module';
 import { TierModelModule } from './tier-model/tier-model.module';
-import { StripeModule } from './stripe/stripe.module';
+import { StripeModule } from './payments/stripe/stripe.module';
 import { OrdersModule } from './orders/orders.module';
 import { ReviewModule } from './review/review.module';
+import { MomoModule } from './payments/momo/momo.module';
+import momoConfig from './config/momo.config';
 
 @Module({
   imports: [
@@ -46,6 +48,7 @@ import { ReviewModule } from './review/review.module';
         fileConfig,
         facebookConfig,
         googleConfig,
+        momoConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -92,6 +95,7 @@ import { ReviewModule } from './review/review.module';
     ModelModule,
     TierModelModule,
     StripeModule,
+    MomoModule,
     OrdersModule,
     ReviewModule,
   ],
