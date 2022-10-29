@@ -1,6 +1,5 @@
-import { Controller, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MomoService } from './momo/momo.service';
 import { StripeService } from './stripe/stripe.service';
 
