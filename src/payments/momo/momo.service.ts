@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { AxiosInstance } from 'axios';
 import { initAxios } from 'src/utils/axios';
 import { sign } from 'src/utils/gen-signature';
+import { CreatePaymentDto } from '../dto/create-payment.dto';
 
 @Injectable()
 export class MomoService {
@@ -10,7 +11,8 @@ export class MomoService {
   constructor(private configService: ConfigService) {
     this.axiosInstance = initAxios();
   }
-  async checkout() {
+  async checkout(data: CreatePaymentDto) {
+    console.log(data);
     const {
       url,
       partnerCode,
@@ -20,7 +22,6 @@ export class MomoService {
       ipnUrl,
       requestType,
     } = this.getConfig();
-    console.log(this.getConfig());
     const requestId = partnerCode + new Date().getTime();
     const dataRaw = `partnerCode=${partnerCode}&accessKey=${accessKey}&requestId=${requestId}&amount=${5000}&orderId=${requestId}&orderInfo=${{}}&returnUrl=${redirectUrl}&notifyUrl=${ipnUrl}&extraData=${{}}`;
     const signature = sign(dataRaw, secretKey);
@@ -77,3 +78,88 @@ export class MomoService {
     };
   }
 }
+
+// thông tin về tài khoản MOMO ở bước 2
+// const partnerCode = 'MOMO_ATM_DEV';
+// const accessKey = 'w9gEg8bjA2AM2Cvr';
+// const serectkey = 'mD9QAVi4cm9N844jh5Y2tqjWaaJoGVFM';
+// const returnUrl = 'http://localhost:3000/comfirm';
+// const notifyurl = 'http://localhost:3000/comfirm';
+// const requestType = 'payWithATM';
+// const extraData = 'eyJ1c2VybmFtZSI6ICJtb21vIn0=';
+
+// router.get('/payment/:id/:amount', async (request, response) => {
+//   // Tạo mã requestId
+//   const requestId = 'REQ' + getRndInteger(100, 1000);
+//   // Số tiền giao dịch
+//   const amount = request.params.amount;
+//   // tạo mã đơn hàng orderId
+//   const orderId = 'OR' + request.params.id + getRndInteger(100, 1000);
+//   const orderInfo = 'demo_test_MOMO';
+//   var rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${notifyurl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${returnUrl}&requestId=${requestId}&requestType=${requestType}`;
+//   var signature = crypto
+//     .createHmac('sha256', serectkey)
+//     .update(rawSignature)
+//     .digest('hex');
+
+//   var body = JSON.stringify({
+//     accessKey: accessKey,
+//     amount: amount,
+//     extraData: extraData,
+//     ipnUrl: notifyurl,
+//     orderId: orderId,
+//     orderInfo: orderInfo,
+//     partnerCode: partnerCode,
+//     redirectUrl: returnUrl,
+//     requestId: requestId,
+//     requestType: requestType,
+//     lang: 'vi',
+//     signature: signature,
+//   });
+//   var options = {
+//     hostname: 'test-payment.momo.vn',
+//     port: 443,
+//     path: '/v2/gateway/api/create',
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Content-Length': Buffer.byteLength(body),
+//     },
+//   };
+//   var req = await https.request(options, (res) => {
+//     res.setEncoding('utf8');
+//     res.on('data', (body) => {
+//       console.log(body);
+//       response.redirect(JSON.parse(body).payUrl);
+//     });
+//     res.on('end', () => {
+//       console.log('No more data in response.');
+//     });
+//   });
+//   req.write(body);
+//   req.end();
+// });
+
+// function getRndInteger(min, max) {
+//   return Math.floor(Math.random() * (max - min)) + min;
+// }
+
+// router.post('/comfirm', (req, res) => {
+//   console.log(req.query);
+//   var data = Object.assign([], req.query);
+//   data.isSuccess = false;
+//   if (req.query.errorCode == '0') {
+//     data.isSuccess = true;
+//   }
+//   res.render('Comfirm', { data: data });
+// });
+
+// router.get('/comfirm', (req, res) => {
+//   console.log(req.query);
+//   var data = Object.assign([], req.query);
+//   data.isSuccess = false;
+//   if (req.query.errorCode == '0') {
+//     data.isSuccess = true;
+//   }
+//   res.render('Comfirm', { data: data });
+// });

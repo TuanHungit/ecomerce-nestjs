@@ -1,5 +1,6 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { CreatePaymentDto } from './dto/create-payment.dto';
 import { MomoService } from './momo/momo.service';
 import { StripeService } from './stripe/stripe.service';
 
@@ -23,9 +24,9 @@ export class PaymentsController {
   }
 
   @Get('momo')
-  checkoutMomo() {
+  checkoutMomo(@Body() createPaymentDto: CreatePaymentDto) {
     try {
-      return this.momoService.checkout();
+      return this.momoService.checkout(createPaymentDto);
     } catch (error) {
       return error;
     }
