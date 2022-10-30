@@ -285,4 +285,19 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     await this.productRepository.save(product);
     return true;
   }
+
+  async purchaseProduct(productId: number, amount: number): Promise<void> {
+    try {
+      await this.productRepository.update(
+        {
+          id: productId,
+        },
+        {
+          sold: () => 'sold' + amount,
+        },
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

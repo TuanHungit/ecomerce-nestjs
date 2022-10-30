@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { MomoService } from './momo/momo.service';
 import { StripeService } from './stripe/stripe.service';
@@ -22,7 +22,7 @@ export class PaymentsController {
     }
   }
 
-  @Post('momo')
+  @Get('momo')
   checkoutMomo() {
     try {
       return this.momoService.checkout();
