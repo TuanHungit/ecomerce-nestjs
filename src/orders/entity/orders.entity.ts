@@ -40,7 +40,7 @@ export class Orders extends BaseEntity {
   quantity: number;
 
   @ApiProperty()
-  @Column({ type: 'enum', enum: ORDER_TYPE, default: ORDER_TYPE.PENDING })
+  @Column({ type: 'enum', enum: ORDER_TYPE, default: ORDER_TYPE.UNPAID })
   status: ORDER_TYPE;
 
   @ApiProperty()
@@ -59,7 +59,7 @@ export class Orders extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @CreateDateColumn()
+  @ApiProperty()
   createdBy: string;
 
   @ApiProperty()

@@ -1,12 +1,19 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { MomoService } from './momo/momo.service';
 import { StripeService } from './stripe/stripe.service';
 
-@ApiTags('Payments')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @Controller('payments')
 export class PaymentsController {
   constructor(
@@ -23,10 +30,21 @@ export class PaymentsController {
     }
   }
 
-  @Get('momo')
-  checkoutMomo(@Body() createPaymentDto: CreatePaymentDto) {
+  @Post('momo')
+  async checkoutMomo(
+    @Request() request,
+    @Res({ passthrough: true }) res,
+    @Body() createPaymentDto: CreatePaymentDto,
+  ) {
+    createPaymentDto.userId = request.user.id;
+    createPaymentDto.createdBy = request.user.email;
     try {
-      return this.momoService.checkout(createPaymentDto);
+      return await this.momoService.checkout(
+        createPaymentDto,
+        (payUrl: string) => {
+          return res.redirect(payUrl);
+        },
+      );
     } catch (error) {
       return error;
     }

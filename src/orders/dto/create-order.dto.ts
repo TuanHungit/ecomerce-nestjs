@@ -39,5 +39,5 @@ export class CreateOrderDto {
   @IsNotEmpty()
   paymentMethod: string;
 
-  updatedBy: string;
+  createdBy: string;
 }

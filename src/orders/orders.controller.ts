@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   DefaultValuePipe,
   Delete,
@@ -11,27 +10,30 @@ import {
   Post,
   Query,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersService } from './orders.service';
 
 @ApiTags('Orders')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 @Controller('orders')
 export class OrdersController {
   constructor(private orderService: OrdersService) {}
 
-  @Post()
-  create(@Request() request, @Body() createOrderDto: CreateOrderDto) {
-    createOrderDto.userId = request.user.id;
-    createOrderDto.updatedBy = request.user.email;
-    return this.orderService.create(createOrderDto);
+  @Get('momo-redirect')
+  handleMomoRedirect(
+    @Res({ passthrough: true }) res,
+    @Query('extraData') extraData: string,
+  ): Promise<void> {
+    return this.orderService.handleMomoRedirect(extraData, (orderId: number) =>
+      res.redirect(`${process.env.CLIENT_REDIRECT_URL}?orderId=${orderId}`),
+    );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post('paging')
   @HttpCode(HttpStatus.OK)
   paging(
@@ -55,6 +57,8 @@ export class OrdersController {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Request() request, @Param('id') id: string) {
@@ -62,6 +66,8 @@ export class OrdersController {
     return this.orderService.findOne({ id: +id });
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.orderService.delete(id);
