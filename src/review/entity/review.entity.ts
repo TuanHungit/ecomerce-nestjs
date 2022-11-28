@@ -19,14 +19,14 @@ export class Review extends EntityHelper {
   id: number;
 
   @ApiProperty()
-  @Column()
+  @Column({ type: 'jsonb' })
   @IsNotEmpty()
-  userId: number;
+  user: Record<string, unknown>;
 
   @ApiProperty()
-  @Column()
+  @Column({ type: 'jsonb' })
   @IsNotEmpty()
-  productId: number;
+  product: Record<string, unknown>;
 
   @ApiProperty()
   @Column()
@@ -53,5 +53,5 @@ export class Review extends EntityHelper {
   @ManyToOne(() => Status, {
     eager: true,
   })
-  status: Status | string;
+  status: Status;
 }

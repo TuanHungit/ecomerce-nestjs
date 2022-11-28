@@ -9,10 +9,9 @@ import {
 } from 'class-validator';
 import { FileEntity } from 'src/files/entities/file.entity';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { Status } from 'src/statuses/entities/status.entity';
 
 export class CreateReviewDto {
-  userId: number;
-
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsExist, ['Product', 'id'], {
@@ -44,4 +43,10 @@ export class CreateReviewDto {
   @IsOptional()
   @IsUUID(4, { each: true })
   files: FileEntity[] | string[];
+
+  status: Status;
+
+  product: Record<string, unknown>;
+
+  user: Record<string, unknown>;
 }

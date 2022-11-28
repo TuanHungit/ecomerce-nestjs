@@ -120,7 +120,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
   async getOne(productId: number): Promise<ProductResponseDto> {
     //* get product
     const product = await super.findOne({ id: productId });
-    console.log('product', product);
+
     //* get review
     const reviews = await this.reviewService.statisticsByRatingAndProduct(
       productId,
