@@ -49,25 +49,61 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
     return super.create(dataToSave);
   }
 
+  async search(
+    paginationOptions: IPaginationOptions,
+    wheres?: any,
+    order?: any,
+  ): Promise<any> {
+    wheres.status = 1;
+    const queryBuilder = this.repository
+      .createQueryBuilder('review')
+      .where({ ...omit(wheres, 'productId') })
+      .skip((paginationOptions.page - 1) * paginationOptions.limit)
+      .take(paginationOptions.limit)
+      .orderBy(order.sort, 'ASC');
+    if (wheres.productId) {
+      queryBuilder.andWhere(`review.product ->> 'id' =:productId`, {
+        productId: wheres.productId,
+      });
+      delete wheres.productId;
+    }
+
+    let totalPages = 1;
+    if (paginationOptions.limit) {
+      const totalRows = await this.repository.count({
+        where: wheres,
+      });
+      totalPages = Math.ceil(totalRows / paginationOptions.limit);
+    }
+    return infinityPagination(
+      await queryBuilder.getMany(),
+      totalPages,
+      paginationOptions,
+    );
+  }
+
   async paging(
     paginationOptions: IPaginationOptions,
     wheres?: any,
     order?: any,
   ): Promise<any> {
-    console.log('orders', order);
     const queryBuilder = this.repository
       .createQueryBuilder('review')
       .where({ ...omit(wheres, 'productId', 'userId') })
       .skip((paginationOptions.page - 1) * paginationOptions.limit)
       .take(paginationOptions.limit)
-      .orderBy(order.sort, order.order);
+      .orderBy(order.sort, 'ASC');
     if (wheres.productId) {
-      queryBuilder.andWhere('review.product.id =:id', { id: wheres.productId });
+      queryBuilder.andWhere(`review.product ->> 'id' =:productId`, {
+        productId: wheres.productId,
+      });
       delete wheres.productId;
     }
 
     if (wheres.userId) {
-      queryBuilder.andWhere('review.user.id =:id', { id: wheres.userId });
+      queryBuilder.andWhere(`review.user ->> 'id' =:userId`, {
+        userId: wheres.userId,
+      });
       delete wheres.userId;
     }
     let totalPages = 1;
@@ -96,5 +132,23 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
       .groupBy('review.rating')
       .getRawMany();
     return reviews;
+  }
+
+  async changeStatus(id: number): Promise<boolean> {
+    const review = await super.findOne({ id });
+    const newStatus =
+      review.status.id === 2
+        ? {
+            id: StatusEnum.active,
+            name: 'Active',
+          }
+        : {
+            id: StatusEnum.inactive,
+            name: 'Inactive',
+          };
+    const { affected } = await this.reviewRepository.update(id, {
+      status: newStatus,
+    });
+    return affected === 1 ? true : false;
   }
 }

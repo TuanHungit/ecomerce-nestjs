@@ -2,7 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductService } from 'src/product/product.service';
 import { BaseService } from 'src/shared/services/base.service';
-import { Repository } from 'typeorm';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Orders } from './entity/orders.entity';
 import { ORDER_TYPE } from './orders.constant';
@@ -20,6 +21,13 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
   async createOrder(data: CreateOrderDto) {
     await this.productService.purchaseProduct(+data.productId, data.amount);
     return super.create(data);
+  }
+
+  async getOrdersByMe(
+    paginationOptions: IPaginationOptions,
+    wheres: FindOptionsWhere<Orders>,
+  ) {
+    return super.findManyWithPagination(paginationOptions, null, wheres);
   }
 
   async handleMomoRedirect(

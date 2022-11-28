@@ -7,13 +7,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { MomoService } from './momo/momo.service';
 import { StripeService } from './stripe/stripe.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
+@ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
   constructor(

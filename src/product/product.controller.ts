@@ -104,9 +104,12 @@ export class ProductController {
     return this.productService.update(id, updateProductDto);
   }
 
+  @ApiBearerAuth()
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.productService.delete(id);
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  delete(@Param('id') id: number) {
+    return this.productService.changeStatus(id);
   }
 
   @ApiBearerAuth()

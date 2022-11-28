@@ -129,8 +129,4 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
   async delete(id: EntityId): Promise<DeleteResult> {
     return await this.repository.delete(id);
   }
-
-  changeStatus(id: EntityId) {
-    return id;
-  }
 }

@@ -32,6 +32,23 @@ export class OrdersController {
     );
   }
 
+  @Get('/me')
+  getOrderByMe(
+    @Request() request,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.orderService.getOrdersByMe(
+      {
+        page,
+        limit,
+      },
+      {
+        userId: request.user.id,
+      },
+    );
+  }
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post('paging')
@@ -62,7 +79,6 @@ export class OrdersController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Request() request, @Param('id') id: string) {
-    console.log('request', request);
     return this.orderService.findOne({ id: +id });
   }
 

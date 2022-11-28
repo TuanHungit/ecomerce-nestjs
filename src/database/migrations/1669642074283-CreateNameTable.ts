@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateNameTable41669130121506 implements MigrationInterface {
-  name = 'CreateNameTable41669130121506';
+export class CreateNameTable1669642074283 implements MigrationInterface {
+  name = 'CreateNameTable1669642074283';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -16,29 +16,12 @@ export class CreateNameTable41669130121506 implements MigrationInterface {
     await queryRunner.query(
       `DROP INDEX "public"."IDX_207eadbaa38ce8cf4625642519"`,
     );
-    await queryRunner.query(`ALTER TABLE "orders" DROP COLUMN "createdBy"`);
     await queryRunner.query(`ALTER TABLE "reviews" DROP COLUMN "userId"`);
     await queryRunner.query(`ALTER TABLE "reviews" DROP COLUMN "productId"`);
     await queryRunner.query(`ALTER TABLE "reviews" ADD "user" jsonb NOT NULL`);
     await queryRunner.query(
       `ALTER TABLE "reviews" ADD "product" jsonb NOT NULL`,
     );
-    await queryRunner.query(
-      `ALTER TYPE "public"."orders_status_enum" RENAME TO "orders_status_enum_old"`,
-    );
-    await queryRunner.query(
-      `CREATE TYPE "public"."orders_status_enum" AS ENUM('unpaid', 'pending', 'aborted', 'successful')`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "orders" ALTER COLUMN "status" DROP DEFAULT`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "orders" ALTER COLUMN "status" TYPE "public"."orders_status_enum" USING "status"::"text"::"public"."orders_status_enum"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "orders" ALTER COLUMN "status" SET DEFAULT 'unpaid'`,
-    );
-    await queryRunner.query(`DROP TYPE "public"."orders_status_enum_old"`);
     await queryRunner.query(
       `CREATE INDEX "IDX_5198460192ebbd084ffbb5aebd" ON "brands_categories" ("brandId") `,
     );
@@ -66,22 +49,6 @@ export class CreateNameTable41669130121506 implements MigrationInterface {
     await queryRunner.query(
       `DROP INDEX "public"."IDX_5198460192ebbd084ffbb5aebd"`,
     );
-    await queryRunner.query(
-      `CREATE TYPE "public"."orders_status_enum_old" AS ENUM('pending', 'aborted', 'successful')`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "orders" ALTER COLUMN "status" DROP DEFAULT`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "orders" ALTER COLUMN "status" TYPE "public"."orders_status_enum_old" USING "status"::"text"::"public"."orders_status_enum_old"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "orders" ALTER COLUMN "status" SET DEFAULT 'pending'`,
-    );
-    await queryRunner.query(`DROP TYPE "public"."orders_status_enum"`);
-    await queryRunner.query(
-      `ALTER TYPE "public"."orders_status_enum_old" RENAME TO "orders_status_enum"`,
-    );
     await queryRunner.query(`ALTER TABLE "reviews" DROP COLUMN "product"`);
     await queryRunner.query(`ALTER TABLE "reviews" DROP COLUMN "user"`);
     await queryRunner.query(
@@ -89,9 +56,6 @@ export class CreateNameTable41669130121506 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "reviews" ADD "userId" integer NOT NULL`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "orders" ADD "createdBy" TIMESTAMP NOT NULL DEFAULT now()`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_207eadbaa38ce8cf4625642519" ON "brands_categories" ("categoriesId") `,

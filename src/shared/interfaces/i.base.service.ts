@@ -19,7 +19,5 @@ export interface IBaseService<T> {
 
   update(id: EntityId, data: any): Promise<T>;
 
-  changeStatus(id: EntityId);
-
   delete(id: EntityId): Promise<DeleteResult>;
 }

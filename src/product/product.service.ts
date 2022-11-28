@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
-import { set } from 'lodash';
+import { get, set } from 'lodash';
 import { FilesService } from 'src/files/files.service';
 import { CreateModelDto } from 'src/model/dto/create-model.dto';
 import { Model } from 'src/model/entities/model.entity';
@@ -212,6 +212,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         searchProductDto.toPrice,
       );
     }
+    wheres.status = 1;
     let totalPages = 1;
     if (paginationOptions.limit) {
       const totalRows = await this.repository.count({
@@ -299,5 +300,19 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async changeStatus(id: number): Promise<boolean> {
+    const product = await super.findOne({ id });
+    const newStatus = get(product, 'status.id') === 2 ? 1 : 2;
+    const { affected } = await this.productRepository.update(
+      {
+        id,
+      },
+      {
+        status: newStatus,
+      },
+    );
+    return affected === 1 ? true : false;
   }
 }
