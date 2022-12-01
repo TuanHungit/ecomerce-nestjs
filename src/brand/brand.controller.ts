@@ -59,6 +59,15 @@ export class BrandController {
     );
   }
 
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  getActivatedList(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.brandService.getAllBrands({
+      page,
+      limit,
+    });
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {

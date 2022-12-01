@@ -21,7 +21,6 @@ export class FilesService extends BaseService<
   }
 
   async uploadFile(file): Promise<FileEntity> {
-    console.log(file);
     if (!file) {
       throw new HttpException(
         {
@@ -55,5 +54,10 @@ export class FilesService extends BaseService<
     fileEntity.type = type;
 
     return this.fileRepository.save(this.fileRepository.create(fileEntity));
+  }
+
+  async uploadFiles(files): Promise<FileEntity[]> {
+    const uploadPromise = files.map((file) => this.uploadFile(file));
+    return await Promise.all(uploadPromise);
   }
 }

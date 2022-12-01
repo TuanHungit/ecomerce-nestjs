@@ -5,13 +5,15 @@ import {
   Post,
   Response,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FilesService } from './files.service';
+import { pngFileFilter } from 'src/utils/common';
 
 @ApiTags('Files')
 @Controller({
@@ -39,6 +41,19 @@ export class FilesController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file) {
     return this.filesService.uploadFile(file);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('uploads')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FilesInterceptor('files', 20, {
+      fileFilter: pngFileFilter,
+    }),
+  )
+  async uploadMultipleFile(@UploadedFiles() files: Array<Express.Multer.File>) {
+    return this.filesService.uploadFiles(files);
   }
 
   @Get(':path')

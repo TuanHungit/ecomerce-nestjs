@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BannerService } from 'src/banner/banner.service';
 import { BaseService } from 'src/shared/services/base.service';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { DeepPartial, Repository } from 'typeorm';
 import { EntityId } from 'typeorm/repository/EntityId';
 import { CreateCategoriesDto } from './dto/create-categories.dto';
@@ -56,5 +57,14 @@ export class CategoriesService extends BaseService<
         throw err;
       });
     return super.update(id, data);
+  }
+
+  async getAllCategories(paginationOptions: IPaginationOptions) {
+    const wheres = {
+      status: {
+        id: 1,
+      },
+    };
+    return await super.findManyWithPagination(paginationOptions, null, wheres);
   }
 }

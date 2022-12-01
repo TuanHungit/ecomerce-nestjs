@@ -27,6 +27,15 @@ import { Categories } from './entity/categories.entity';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  getActivatedList(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.categoriesService.getAllCategories({
+      page,
+      limit,
+    });
+  }
+
   @Post()
   create(@Body() createCategoriesDto: CreateCategoriesDto) {
     return this.categoriesService.createWithBanners(createCategoriesDto);

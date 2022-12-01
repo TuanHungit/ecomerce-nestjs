@@ -34,6 +34,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     orders?: FindOptionsOrder<T>,
     likes?: (keyof T)[],
   ) {
+    // console.log('wheres', wheres);
     const selects: (keyof T)[] = [];
     if (fields) {
       fields.split(',').forEach((el) => {
