@@ -107,18 +107,18 @@ export class Product extends EntityHelper {
   })
   brand: Brand | number;
 
-  @ApiProperty()
-  @ManyToOne(() => TierModel, {
-    eager: true,
-  })
-  @JoinColumn()
-  tierModel?: TierModel | string | number;
+  // @ApiProperty()
+  // @ManyToOne(() => TierModel, {
+  //   eager: true,
+  // })
+  // @JoinColumn()
+  // tierModel?: TierModel | string | number;
 
-  @OneToMany(() => Model, (model) => model.product, {
+  @ManyToMany(() => TierModel, {
     eager: true,
   })
-  @JoinColumn()
-  models: Model[] | string[];
+  @JoinTable()
+  tierModels: TierModel[] | string[];
 
   @ManyToMany(() => User, { eager: true })
   @JoinTable({

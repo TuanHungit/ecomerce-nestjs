@@ -1,3 +1,4 @@
+import { Model } from 'src/model/entities/model.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
@@ -5,6 +6,8 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -22,6 +25,12 @@ export class TierModel extends EntityHelper {
     eager: true,
   })
   status: Status;
+
+  @ManyToMany(() => Model, {
+    eager: true,
+  })
+  @JoinTable()
+  models: Model[] | string[];
 
   @CreateDateColumn()
   createdAt: Date;
