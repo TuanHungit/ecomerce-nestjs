@@ -66,7 +66,6 @@ class ModelResponse {
 }
 class TierModelResponse {
   @Expose()
-  @Transform(({ obj }) => obj.name)
   name: string;
 
   @Expose()
@@ -130,7 +129,7 @@ export class ProductResponseDto {
 
   @Expose()
   @Type(() => TierModelResponse)
-  tierModel?: TierModelResponse;
+  tierModels?: TierModelResponse[];
 
   @Expose()
   keywords?: string[];

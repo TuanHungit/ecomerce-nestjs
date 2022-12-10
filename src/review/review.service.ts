@@ -125,9 +125,8 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
       .createQueryBuilder('review')
       .select('COUNT(review.id)', 'totalReview')
       .addSelect('review.rating', 'rating')
-      .where({
+      .where(`review.product ->> 'id' =:productId`, {
         productId,
-        // status: StatusEnum.active,
       })
       .groupBy('review.rating')
       .getRawMany();

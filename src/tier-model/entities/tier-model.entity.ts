@@ -29,7 +29,9 @@ export class TierModel extends EntityHelper {
   @ManyToMany(() => Model, {
     eager: true,
   })
-  @JoinTable()
+  @JoinTable({
+    name: 'tierModel_model',
+  })
   models: Model[] | string[];
 
   @CreateDateColumn()

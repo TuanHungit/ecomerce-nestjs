@@ -1,4 +1,3 @@
-import { Product } from 'src/product/entity/product.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
@@ -33,9 +32,6 @@ export class Model extends EntityHelper {
 
   @Column()
   image?: string;
-
-  @ManyToOne(() => Product, (product) => product.models)
-  product?: Product;
 
   @ManyToOne(() => Status, {
     eager: true,

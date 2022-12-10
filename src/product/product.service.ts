@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import { Exception } from 'handlebars';
 import { get, set } from 'lodash';
 import { FilesService } from 'src/files/files.service';
 import { CreateModelDto } from 'src/model/dto/create-model.dto';
@@ -12,7 +13,6 @@ import { StatusEnum } from 'src/statuses/statuses.enum';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
 import { TierModelService } from 'src/tier-model/tier-model.service';
 import { UsersService } from 'src/users/users.service';
-import { deepCloneObject } from 'src/utils/deep-clone-object';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import {
@@ -43,67 +43,78 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
 
   async create(data: CreateProductDto): Promise<Product> {
     // create tier-model
-    const { tierModel, models } = data;
+    const { tierModels } = data;
     const status = {
       id: StatusEnum.active,
       name: 'Active',
     };
-    let tierModelEntity = new TierModel();
-    // find tier-model by name
-    try {
-      tierModelEntity = await this.tierModelService.findOne({
-        name: tierModel as string,
-      });
-    } catch (err) {
-      tierModelEntity.name = tierModel as string;
-      tierModelEntity.status = status;
+    console.log('tierModels', tierModels);
+    const tierModelsPromise = await tierModels.map(async (tier) => {
+      let tierModelEntity = new TierModel();
+      // find tier-model by name
+      try {
+        tierModelEntity = await this.tierModelService.findOne({
+          name: tier.tierModel as string,
+        });
+        if (!tierModelEntity) {
+          throw new Exception('Tier model not found!');
+        }
+      } catch (err) {
+        tierModelEntity.name = tier.tierModel as string;
+        tierModelEntity.status = status;
+
+        try {
+          const newTierModel = await this.tierModelService.create(
+            tierModelEntity,
+          );
+          tierModelEntity = newTierModel;
+        } catch (err) {
+          throw new HttpException(
+            {
+              status: HttpStatus.BAD_REQUEST,
+              errors: {
+                message: 'Create tier-model record failed!',
+              },
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+
+      // create model
+      const modelPromises: Promise<Model>[] = tier.models?.map(
+        async (modelDto: CreateModelDto) => {
+          const model = {
+            ...modelDto,
+            price:
+              modelDto.priceBeforeDiscount -
+              Math.floor((modelDto.priceBeforeDiscount * data.discount) / 100),
+            status,
+          };
+          return await this.modelService.create(model);
+        },
+      );
 
       try {
-        const newTierModel = await this.tierModelService.create(
-          tierModelEntity,
-        );
-        tierModelEntity = newTierModel;
+        tierModelEntity.models = await Promise.all(modelPromises);
+        console.log('tierModelEntity.models', tierModelEntity.models);
       } catch (err) {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
             errors: {
-              message: 'Create tier-model record failed!',
+              message: 'Create model record failed!',
             },
           },
           HttpStatus.BAD_REQUEST,
         );
       }
-    }
+      return await this.tierModelService.create(tierModelEntity);
+    });
 
-    // create model
-    const modelPromises: Promise<Model>[] = models.map(
-      (modelDto: CreateModelDto) => {
-        const model = {
-          ...modelDto,
-          price:
-            modelDto.priceBeforeDiscount -
-            Math.floor((modelDto.priceBeforeDiscount * data.discount) / 100),
-          status,
-        };
-        return this.modelService.create(model);
-      },
-    );
-
-    try {
-      data.models = await Promise.all(modelPromises);
-    } catch (err) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          errors: {
-            message: 'Create model record failed!',
-          },
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
+    data.tierModels = await Promise.all(tierModelsPromise);
+    console.log('savedTierModels', data.tierModels);
+    console.log('savedModels', get(data.tierModels, '[0].models'));
     // find images
     await Promise.all(
       data.images?.map((id) => {
@@ -112,8 +123,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     ).then((res) => {
       data.images = res;
     });
-
-    data.tierModel = tierModelEntity;
+    console.log('data', data.tierModels[0].models);
     return super.create(data);
   }
 
@@ -133,17 +143,17 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
       reviews?.reduce((prev, cur) => {
         return prev + +cur.totalReview;
       }, 0);
-
+    console.log('product', product);
     return plainToClass(
       ProductResponseDto,
       {
         ...product,
         ratingAvg: Math.round(ratingAvg * 10) / 10,
         statisticReview: reviews,
-        tierModel: {
-          ...deepCloneObject(product.tierModel),
-          models: product.models,
-        },
+        // tierModel: {
+        //   ...deepCloneObject(product.tierModel),
+        //   models: product.models,
+        // },
       },
       {
         excludeExtraneousValues: true,

@@ -17,6 +17,17 @@ import { TierModel } from 'src/tier-model/entities/tier-model.entity';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 import { IsNotExist } from 'src/utils/validators/is-not-exists.validator';
 
+class TierModelDto {
+  @ApiProperty({ type: String })
+  @IsNotEmpty()
+  tierModel?: TierModel | string;
+
+  @ApiProperty({ type: [CreateModelDto] })
+  @IsNotEmpty()
+  @IsArray()
+  models: Model[] | CreateModelDto[];
+}
+
 export class CreateProductDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -79,14 +90,15 @@ export class CreateProductDto {
   })
   brand: Brand | number;
 
-  @ApiProperty({ type: String })
-  @IsNotEmpty()
-  tierModel?: TierModel | string;
-
-  @ApiProperty({ type: [CreateModelDto] })
+  @ApiProperty({ type: [TierModelDto] })
   @IsNotEmpty()
   @IsArray()
-  models: Model[] | CreateModelDto[];
+  tierModels?: TierModelDto[] | TierModel[];
+
+  // @ApiProperty({ type: [CreateModelDto] })
+  // @IsNotEmpty()
+  // @IsArray()
+  // models: Model[] | CreateModelDto[];
 
   @ApiProperty({ type: [String] })
   @IsOptional()

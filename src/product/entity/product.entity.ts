@@ -115,7 +115,9 @@ export class Product extends EntityHelper {
   @ManyToMany(() => TierModel, {
     eager: true,
   })
-  @JoinTable()
+  @JoinTable({
+    name: 'product_tierModel',
+  })
   tierModels: TierModel[] | string[];
 
   @ManyToMany(() => User, { eager: true })
