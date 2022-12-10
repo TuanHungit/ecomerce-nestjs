@@ -32,7 +32,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       errors = get(exception, 'response', {});
     } else if (httpStatus === HttpStatus.UNPROCESSABLE_ENTITY) {
       errors = {
-        message: Object.values(errors)[0],
+        message: get(Object.values(errors), '[0]'),
       };
     }
     delete errors.statusCode;

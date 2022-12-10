@@ -89,7 +89,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsNumber()
   @Validate(IsExist, ['Brand', 'id'], {
-    message: 'brandNotExists',
+    message: 'Brand not exists',
   })
   brand: Brand | number;
 
