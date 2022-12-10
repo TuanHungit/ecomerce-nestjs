@@ -17,7 +17,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // constructor method, thus we should resolve it here.
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
-    console.log('exception', exception);
     let errors = get(exception, 'response.errors', get(exception, 'response'));
     const httpStatus =
       exception instanceof HttpException
@@ -31,6 +30,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       };
     } else if (httpStatus === HttpStatus.BAD_REQUEST) {
       errors = get(exception, 'response', {});
+    } else if (httpStatus === HttpStatus.UNPROCESSABLE_ENTITY) {
+      errors = {
+        message: Object.values(errors)[0],
+      };
     }
     delete errors.statusCode;
     delete errors.status;

@@ -10,7 +10,7 @@ export class BrandCategoriesDto {
   @ApiProperty()
   @IsOptional()
   @Validate(IsExist, ['Categories', 'id'], {
-    message: 'categoriesNotExists',
+    message: 'Categories not exists',
   })
   categoriesId?: number;
 }

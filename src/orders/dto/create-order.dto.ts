@@ -18,7 +18,7 @@ export class CreateOrderDto {
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsExist, ['Product', 'id'], {
-    message: 'productNotExists',
+    message: 'Product not exists',
   })
   productId: string;
 

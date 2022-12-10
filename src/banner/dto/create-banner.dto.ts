@@ -13,7 +13,7 @@ export class CreateBannerDto {
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsNotExist, ['Banner'], {
-    message: 'titleAlreadyExists',
+    message: 'Title already exists',
   })
   title: string;
 
@@ -33,7 +33,7 @@ export class CreateBannerDto {
   })
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   photo: string;
 
@@ -42,7 +42,7 @@ export class CreateBannerDto {
   })
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status: number;
 }

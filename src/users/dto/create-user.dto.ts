@@ -19,7 +19,7 @@ export class CreateUserDto {
   @Transform(({ value }) => value?.toLowerCase().trim())
   @IsNotEmpty()
   @Validate(IsNotExist, ['User'], {
-    message: 'emailAlreadyExists',
+    message: 'Email already exists',
   })
   @IsEmail()
   email: string | null;
@@ -48,7 +48,7 @@ export class CreateUserDto {
   @ApiProperty({ type: () => FileEntity })
   @IsOptional()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   photo?: FileEntity | null;
 
@@ -60,7 +60,7 @@ export class CreateUserDto {
 
   @ApiProperty({ type: Status })
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status?: Status;
 

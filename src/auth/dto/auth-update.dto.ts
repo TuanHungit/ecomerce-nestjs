@@ -16,21 +16,21 @@ export class AuthUpdateDto {
   @IsOptional()
   @Transform(({ value }) => value.toLowerCase().trim())
   @Validate(IsNotExist, ['User'], {
-    message: 'emailAlreadyExists',
+    message: 'Email already exists',
   })
   email: string;
 
   @ApiProperty({ type: () => FileEntity })
   @IsOptional()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   photo?: FileEntity;
 
   @ApiProperty()
   @IsOptional()
   @Validate(IsNotExist, ['User'], {
-    message: 'usernameAlreadyExists',
+    message: 'userName already exists',
   })
   username?: string | null;
 

@@ -20,7 +20,7 @@ export class CreateModelDto {
   @ApiProperty()
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   image?: string;
 }

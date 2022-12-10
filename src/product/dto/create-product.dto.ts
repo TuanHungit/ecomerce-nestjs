@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsString,
   IsUUID,
   Validate,
 } from 'class-validator';
@@ -31,13 +32,15 @@ class TierModelDto {
 export class CreateProductDto {
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
   @Validate(IsNotExist, ['Product'], {
-    message: 'nameAlreadyExists',
+    message: 'Name already exists',
   })
   name: string;
 
   @ApiProperty()
   @IsOptional()
+  @IsString()
   description: string;
 
   @ApiProperty({
@@ -47,7 +50,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   image: FileEntity | string;
 
@@ -78,7 +81,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsNumber()
   @Validate(IsExist, ['Categories', 'id'], {
-    message: 'categoriesNotExists',
+    message: 'Categories not exists',
   })
   categories: Categories | number;
 
@@ -95,11 +98,6 @@ export class CreateProductDto {
   @IsArray()
   tierModels?: TierModelDto[] | TierModel[];
 
-  // @ApiProperty({ type: [CreateModelDto] })
-  // @IsNotEmpty()
-  // @IsArray()
-  // models: Model[] | CreateModelDto[];
-
   @ApiProperty({ type: [String] })
   @IsOptional()
   @IsArray()
@@ -111,7 +109,7 @@ export class CreateProductDto {
   })
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status: Status | number;
 }

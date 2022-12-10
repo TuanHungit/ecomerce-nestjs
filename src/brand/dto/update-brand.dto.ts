@@ -9,7 +9,7 @@ export class UpdateBrandDto {
   @ApiProperty()
   @IsOptional()
   @Validate(IsNotExist, ['Brand'], {
-    message: 'nameAlreadyExists',
+    message: 'Name already exists',
   })
   name: string;
 
@@ -19,7 +19,7 @@ export class UpdateBrandDto {
   @IsOptional()
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   logo: string;
 
@@ -29,7 +29,7 @@ export class UpdateBrandDto {
   @IsOptional()
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   image: string;
 
@@ -47,7 +47,7 @@ export class UpdateBrandDto {
   @IsOptional()
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status?: Status | number;
 }

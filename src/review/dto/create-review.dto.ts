@@ -15,7 +15,7 @@ export class CreateReviewDto {
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsExist, ['Product', 'id'], {
-    message: 'productNotExists',
+    message: 'Product not exists',
   })
   productId: number;
 

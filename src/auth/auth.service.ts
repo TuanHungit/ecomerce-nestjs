@@ -46,7 +46,7 @@ export class AuthService {
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            email: 'notFound',
+            email: 'Not Found',
           },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -184,7 +184,7 @@ export class AuthService {
       throw new HttpException(
         {
           status: HttpStatus.NOT_FOUND,
-          error: `notFound`,
+          error: `Not Found`,
         },
         HttpStatus.NOT_FOUND,
       );
@@ -207,7 +207,7 @@ export class AuthService {
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            email: 'emailNotExists',
+            email: 'Email not exists',
           },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -243,7 +243,7 @@ export class AuthService {
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            hash: `notFound`,
+            hash: `Not Found`,
           },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,

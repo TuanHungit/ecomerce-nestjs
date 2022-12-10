@@ -7,7 +7,7 @@ export class AuthRegisterLoginDto {
   @ApiProperty({ example: 'test1@example.com' })
   @Transform(({ value }) => value.toLowerCase().trim())
   @Validate(IsNotExist, ['User'], {
-    message: 'emailAlreadyExists',
+    message: 'Email already exists',
   })
   @IsEmail()
   email: string;

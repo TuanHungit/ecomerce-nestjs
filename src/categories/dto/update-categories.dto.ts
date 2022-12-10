@@ -9,7 +9,7 @@ export class UpdateCategoriesDto {
   @ApiProperty()
   @IsOptional()
   @Validate(IsNotExist, ['Brand'], {
-    message: 'nameAlreadyExists',
+    message: 'Name already exists',
   })
   name: string;
 
@@ -19,7 +19,7 @@ export class UpdateCategoriesDto {
   @IsOptional()
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   logo: string;
 
@@ -33,7 +33,7 @@ export class UpdateCategoriesDto {
   @IsOptional()
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status?: Status | number;
 }

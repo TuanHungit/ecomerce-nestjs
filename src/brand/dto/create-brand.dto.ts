@@ -16,7 +16,7 @@ export class CreateBrandDto {
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsNotExist, ['Brand'], {
-    message: 'nameAlreadyExists',
+    message: 'Name already exists',
   })
   name: string;
 
@@ -25,7 +25,7 @@ export class CreateBrandDto {
   })
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   @Validate(IsNotExistSub, ['Brand', 'id'], {
     message: 'This logo is already use for another brand',
@@ -37,7 +37,7 @@ export class CreateBrandDto {
   })
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   @Validate(IsNotExistSub, ['Brand', 'id'], {
     message: 'This image is already use for another brand',
@@ -47,7 +47,7 @@ export class CreateBrandDto {
   @ApiProperty()
   @IsOptional()
   // @Validate(IsExist, ['Categories', 'id'], {
-  //   message: 'imageNotExists',
+  //   message: 'Image not exists',
   // })
   categories: Categories[] | number[];
 
@@ -60,7 +60,7 @@ export class CreateBrandDto {
   })
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status: Status | number;
 }

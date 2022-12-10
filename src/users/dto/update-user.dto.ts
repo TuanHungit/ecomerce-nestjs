@@ -21,7 +21,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @Transform(({ value }) => value?.toLowerCase().trim())
   @IsOptional()
   @Validate(IsNotExist, ['User'], {
-    message: 'emailAlreadyExists',
+    message: 'Email already exists',
   })
   @IsEmail()
   email?: string | null;
@@ -29,7 +29,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty()
   @IsOptional()
   @Validate(IsNotExist, ['User'], {
-    message: 'usernameAlreadyExists',
+    message: 'userName already exists',
   })
   username?: string | null;
 
@@ -61,7 +61,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ type: () => FileEntity })
   @IsOptional()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   photo?: FileEntity | null;
 
@@ -75,7 +75,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ type: Status })
   @IsOptional()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status?: Status;
 

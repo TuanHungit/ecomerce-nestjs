@@ -15,7 +15,7 @@ export class CreateCategoriesDto {
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsNotExist, ['Categories'], {
-    message: 'nameAlreadyExists',
+    message: 'Name already exists',
   })
   name: string;
 
@@ -24,7 +24,7 @@ export class CreateCategoriesDto {
   })
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   logo: string;
 
@@ -37,7 +37,7 @@ export class CreateCategoriesDto {
   })
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status: Status | number;
 }

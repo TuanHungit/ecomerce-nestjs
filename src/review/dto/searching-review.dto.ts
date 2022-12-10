@@ -7,7 +7,7 @@ export class SearchingReviewDto {
   @IsOptional()
   @IsNumber()
   @Validate(IsExist, ['Product', 'id'], {
-    message: 'productNotExists',
+    message: 'Product not exists',
   })
   productId?: number | null;
 

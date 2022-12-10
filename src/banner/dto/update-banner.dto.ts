@@ -14,7 +14,7 @@ export class UpdateBannerDto {
   @IsOptional()
   @IsNotEmpty()
   @Validate(IsNotExist, ['Banner'], {
-    message: 'titleAlreadyExists',
+    message: 'Title already exists',
   })
   title?: string;
 
@@ -34,7 +34,7 @@ export class UpdateBannerDto {
   @IsOptional()
   @IsNotEmpty()
   @Validate(IsNotExist, ['Banner'], {
-    message: 'orderAlreadyExists',
+    message: 'Order already exists',
   })
   order?: number;
 
@@ -42,7 +42,7 @@ export class UpdateBannerDto {
   @IsOptional()
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
+    message: 'Image not exists',
   })
   photo: string;
 
@@ -50,7 +50,7 @@ export class UpdateBannerDto {
   @IsOptional()
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status?: number;
 }

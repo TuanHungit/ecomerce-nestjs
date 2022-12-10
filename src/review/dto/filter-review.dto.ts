@@ -15,7 +15,7 @@ export class FilterReviewDto {
   @IsOptional()
   @IsNumber()
   @Validate(IsExist, ['Product', 'id'], {
-    message: 'productNotExists',
+    message: 'Product not exists',
   })
   productId?: number | null;
 
@@ -30,7 +30,7 @@ export class FilterReviewDto {
   @IsOptional()
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
+    message: 'Status not exists',
   })
   status: number | null;
 
