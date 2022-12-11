@@ -23,19 +23,22 @@ export class CategoriesService extends BaseService<
   }
 
   async createWithBanners(data: CreateCategoriesDto): Promise<Categories> {
-    await Promise.all(
-      data.banners?.map((id) => {
-        return this.bannerService.findOne({ id });
-      }),
-    )
-      .then((res) => {
-        console.log(res);
-        data.banners = res;
-      })
-      .catch((err) => {
-        delete data.banners;
-        throw err;
-      });
+    console.log('data', data);
+    if (data.banners) {
+      await Promise.all(
+        data.banners?.map((id) => {
+          return this.bannerService.findOne({ id });
+        }),
+      )
+        .then((res) => {
+          console.log(res);
+          data.banners = res;
+        })
+        .catch((err) => {
+          delete data.banners;
+          throw err;
+        });
+    }
     return super.create(data as DeepPartial<Categories>);
   }
 
