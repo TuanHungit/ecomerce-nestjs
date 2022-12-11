@@ -28,6 +28,15 @@ import { Banner } from './entities/banner.entity';
 export class BannerController {
   constructor(private bannerService: BannerService) {}
 
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  getActivatedList(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.bannerService.getAllBanners({
+      page,
+      limit,
+    });
+  }
+
   @Post()
   @HttpCode(HttpStatus.OK)
   create(@Body() banner: CreateBannerDto) {

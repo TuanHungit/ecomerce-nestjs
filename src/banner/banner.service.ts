@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { DeepPartial, Repository } from 'typeorm';
 import { BaseService } from './../shared/services/base.service';
 import { Banner } from './entities/banner.entity';
@@ -29,5 +30,14 @@ export class BannerService extends BaseService<Banner, Repository<Banner>> {
       .select('MAX(Banner.order)', 'max');
     const result = await query.getRawOne();
     return result.max;
+  }
+
+  async getAllBanners(paginationOptions: IPaginationOptions) {
+    const wheres = {
+      status: {
+        id: 1,
+      },
+    };
+    return await super.findManyWithPagination(paginationOptions, null, wheres);
   }
 }
