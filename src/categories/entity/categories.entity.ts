@@ -29,6 +29,7 @@ export class Categories extends EntityHelper {
   @ManyToMany(() => Banner, {
     cascade: true,
     eager: true,
+    nullable: true,
   })
   @JoinTable({
     name: 'categories_banners',
