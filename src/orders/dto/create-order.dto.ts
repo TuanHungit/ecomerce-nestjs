@@ -1,20 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, Validate } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  Validate,
+} from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 
-export class CreateOrderDto {
-  @ApiProperty()
-  @IsOptional()
-  @IsNumber()
-  discount: number;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  amount: number;
-
-  userId: string;
-
+export class ProductDto {
   @ApiProperty()
   @IsNotEmpty()
   @Validate(IsExist, ['Product', 'id'], {
@@ -26,6 +20,31 @@ export class CreateOrderDto {
   @IsNotEmpty()
   @IsNumber()
   quantity: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  amount: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  discount: number;
+}
+export class CreateOrderDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  totalAmount: number;
+
+  @ApiProperty({
+    type: [ProductDto],
+  })
+  @IsNotEmpty()
+  @IsArray()
+  products: ProductDto[];
+
+  userId: string;
 
   @ApiProperty()
   @IsOptional()

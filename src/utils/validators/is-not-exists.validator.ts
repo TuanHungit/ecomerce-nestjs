@@ -19,8 +19,6 @@ export class IsNotExist implements ValidatorConstraintInterface {
   async validate(value: string, validationArguments: ValidationArguments) {
     const repository = validationArguments.constraints[0] as string;
     const currentValue = validationArguments.object as ValidationEntity;
-    console.log('value', value);
-
     if (!value) {
       return true;
     }
@@ -29,6 +27,7 @@ export class IsNotExist implements ValidatorConstraintInterface {
         [validationArguments.property]: value,
       },
     })) as ValidationEntity;
+    console.log('validationArguments', validationArguments);
     console.log('entity', entity);
     if (entity?.id === currentValue?.id) {
       return true;

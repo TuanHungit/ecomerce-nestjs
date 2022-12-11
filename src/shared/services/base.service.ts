@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  BaseEntity,
-  DeleteResult,
-  Repository,
-  FindOptionsOrder,
-  FindOptionsWhere,
-  Like,
-  DeepPartial,
-} from 'typeorm';
-import { IBaseService } from '../interfaces/i.base.service';
-import { EntityId } from 'typeorm/repository/EntityId';
-import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import {
+  BaseEntity,
+  DeepPartial,
+  DeleteResult,
+  FindOptionsOrder,
+  FindOptionsWhere,
+  ILike,
+  Repository,
+} from 'typeorm';
+import { EntityId } from 'typeorm/repository/EntityId';
+import { IBaseService } from '../interfaces/i.base.service';
 
 export class BaseService<T extends BaseEntity, R extends Repository<T>>
   implements IBaseService<T>
@@ -47,7 +47,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     if (likes) {
       likes.forEach((el: any) => {
         if (wheres[el]) {
-          wheres[el] = Like(`%${wheres[el]}%`);
+          wheres[el] = ILike(`%${wheres[el]}%`);
         }
       });
     }

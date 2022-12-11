@@ -43,19 +43,22 @@ export class CategoriesService extends BaseService<
     id: EntityId,
     data: UpdateCategoriesDto,
   ): Promise<Categories> {
-    await Promise.all(
-      data.banners?.map((id) => {
-        return this.bannerService.findOne({ id });
-      }),
-    )
-      .then((res) => {
-        console.log(res);
-        data.banners = res;
-      })
-      .catch((err) => {
-        delete data.banners;
-        throw err;
-      });
+    if (data.banners) {
+      await Promise.all(
+        data.banners?.map((id) => {
+          return this.bannerService.findOne({ id });
+        }),
+      )
+        .then((res) => {
+          console.log(res);
+          data.banners = res;
+        })
+        .catch((err) => {
+          delete data.banners;
+          throw err;
+        });
+    }
+
     return super.update(id, data);
   }
 

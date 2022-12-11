@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Product } from 'src/product/entity/product.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,27 +20,30 @@ export class Orders extends BaseEntity {
 
   @ApiProperty()
   @Column()
-  amount: number;
+  totalAmount: number;
 
   @ApiProperty()
   @Column({ nullable: true })
-  discount: number;
-
-  @ApiProperty()
-  @Column({ nullable: true })
-  amountBeforeDiscount: number;
+  totalAmountBeforeDiscount: number;
 
   @ApiProperty()
   @Column()
   userId: string;
 
   @ApiProperty()
-  @Column()
-  productId: string;
-
-  @ApiProperty()
-  @Column()
-  quantity: number;
+  @ManyToMany(() => Product)
+  @JoinTable({
+    name: 'order_products',
+    joinColumn: {
+      name: 'orderId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'productId',
+      referencedColumnName: 'id',
+    },
+  })
+  products: Product[];
 
   @ApiProperty()
   @Column({ type: 'enum', enum: ORDER_TYPE, default: ORDER_TYPE.UNPAID })
