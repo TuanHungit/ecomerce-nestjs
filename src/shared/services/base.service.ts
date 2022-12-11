@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { get } from 'lodash';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
@@ -75,9 +76,20 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     );
   }
 
-  async findOne(fields: EntityCondition<T>, relations?: string[]): Promise<T> {
+  async findOne(
+    fields: EntityCondition<T> | EntityCondition<T>[],
+    relations?: string[],
+  ): Promise<T> {
+    const isSlug = isNaN(+get(fields, 'id'));
+    const where = !isSlug
+      ? ({
+          id: get(fields, 'id'),
+        } as EntityCondition<T>)
+      : ({
+          slug: get(fields, 'id'),
+        } as EntityCondition<T>);
     const entity = await this.repository.findOne({
-      where: fields,
+      where: where,
       ...(!relations
         ? { loadEagerRelations: true }
         : {
@@ -90,6 +102,9 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     Object.keys(fields).forEach((key) => {
       error += `${key} = ${fields[key]}`;
     });
+    if (isSlug) {
+      error = error?.replace(' id = ', ' slug = ');
+    }
     if (!entity) {
       throw new HttpException(
         {
@@ -113,7 +128,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
       await this.repository.save(
         this.repository.create({ id, ...data }) as any,
       );
-      return this.findOne({ id } as unknown as EntityCondition<T>);
+      return this.findOne([{ id }] as unknown as EntityCondition<T>[]);
     } catch (err) {
       throw new HttpException(
         {

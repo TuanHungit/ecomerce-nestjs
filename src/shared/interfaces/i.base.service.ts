@@ -13,7 +13,7 @@ export interface IBaseService<T> {
     likes?: (keyof T)[],
   );
 
-  findOne(fields: EntityCondition<T>): Promise<T>;
+  findOne(fields: EntityCondition<T> | EntityCondition<T>[]): Promise<T>;
 
   create(data: DeepPartial<T>): Promise<T>;
 
