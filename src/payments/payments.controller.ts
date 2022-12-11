@@ -46,6 +46,7 @@ export class PaymentsController {
           return res.redirect(payUrl);
         },
       );
+      return await '';
     } catch (error) {
       return error;
     }

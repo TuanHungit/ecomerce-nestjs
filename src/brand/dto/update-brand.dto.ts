@@ -1,11 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from 'aws-sdk/clients/directconnect';
-import { IsNumber, IsOptional, IsUUID, Validate } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsUUID,
+  Validate,
+} from 'class-validator';
 import { Categories } from 'src/categories/entity/categories.entity';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 import { IsNotExist } from 'src/utils/validators/is-not-exists.validator';
 
 export class UpdateBrandDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  id: string | number;
+
   @ApiProperty()
   @IsOptional()
   @Validate(IsNotExist, ['Brand'], {

@@ -6,6 +6,7 @@ import {
   IsUUID,
   IsNumber,
   IsOptional,
+  IsArray,
 } from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 import { IsNotExist } from 'src/utils/validators/is-not-exists.validator';
@@ -30,6 +31,8 @@ export class CreateCategoriesDto {
 
   @ApiProperty({ type: Array<number> })
   @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
   banners: Banner[] | number[];
 
   @ApiProperty({

@@ -19,10 +19,8 @@ export class MomoService {
     //* prepare pending order data
     const createOrderDto = new CreateOrderDto();
     createOrderDto.userId = data.userId;
-    createOrderDto.discount = data.discount;
-    createOrderDto.amount = data.amount;
-    createOrderDto.productId = data.productId;
-    createOrderDto.quantity = data.quantity;
+    createOrderDto.totalAmount = data.totalAmount;
+    createOrderDto.products = data.products;
     createOrderDto.note = data.note;
     createOrderDto.address = data.address;
     createOrderDto.paymentMethod = PAYMENT_TYPE.MOMO;
@@ -40,21 +38,21 @@ export class MomoService {
       ipnUrl,
       requestType,
     } = this.getConfig();
-    const { amount, ...rest } = data;
+    const { totalAmount, ...rest } = data;
     const extraData = Buffer.from(
       JSON.stringify({ ...rest, orderId: order.id }),
     ).toString('base64');
     const requestId = partnerCode + new Date().getTime();
     const orderId = requestId;
     const orderInfo = 'Thanh toán online';
-    const dataRaw = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+    const dataRaw = `accessKey=${accessKey}&amount=${totalAmount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
     const signature = sign(dataRaw, secretKey);
 
     //* call momo api
     return axios
       .post(`${url}/v2/gateway/api/create`, {
         accessKey,
-        amount,
+        amount: totalAmount,
         extraData,
         ipnUrl,
         orderId,

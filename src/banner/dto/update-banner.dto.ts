@@ -13,9 +13,6 @@ export class UpdateBannerDto {
   @ApiProperty()
   @IsOptional()
   @IsNotEmpty()
-  @Validate(IsNotExist, ['Banner'], {
-    message: 'Title already exists',
-  })
   title?: string;
 
   @ApiPropertyOptional({
