@@ -25,6 +25,7 @@ export class IsNotExistSub implements ValidatorConstraintInterface {
           [subField]: value,
         },
       },
+      loadEagerRelations: false,
     });
 
     if (entity?.id === value) {

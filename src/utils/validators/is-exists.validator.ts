@@ -28,6 +28,7 @@ export class IsExist implements ValidatorConstraintInterface {
                 ? value[pathToProperty]
                 : value,
           },
+          loadEagerRelations: false,
         });
       return Boolean(entity);
     } catch (err) {

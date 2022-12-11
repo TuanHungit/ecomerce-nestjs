@@ -26,6 +26,9 @@ export class IsNotExist implements ValidatorConstraintInterface {
       where: {
         [validationArguments.property]: value,
       },
+      loadEagerRelations: false,
+      /// <reference path="" />
+      relations: [],
     })) as ValidationEntity;
     console.log('validationArguments', validationArguments);
     console.log('entity', entity);
