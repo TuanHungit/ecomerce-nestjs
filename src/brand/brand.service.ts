@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 import { CategoriesService } from 'src/categories/categories.service';
 import { BaseService } from 'src/shared/services/base.service';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { GetBrandDetailReponseDto } from './dto/get-brand-response.dto';
 import { Brand } from './entities/brand.entity';
 
 @Injectable()
@@ -27,6 +29,19 @@ export class BrandService extends BaseService<Brand, Repository<Brand>> {
     });
 
     return super.create(data as DeepPartial<Brand>);
+  }
+
+  async getOne(id: string): Promise<GetBrandDetailReponseDto> {
+    const data = await super.findOne({ id }, [
+      'logo',
+      'status',
+      'image',
+      'categories',
+    ]);
+    console.log(data);
+    return plainToClass(GetBrandDetailReponseDto, data, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async getAllBrands(paginationOptions: IPaginationOptions) {

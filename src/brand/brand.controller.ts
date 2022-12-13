@@ -71,7 +71,7 @@ export class BrandController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
-    return this.brandService.findOne({ id });
+    return this.brandService.getOne(id);
   }
 
   @Patch(':id')
