@@ -32,6 +32,8 @@ export class OrdersController {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Get('/me')
   getOrderByMe(
     @Request() request,

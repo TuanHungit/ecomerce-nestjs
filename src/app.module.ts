@@ -35,6 +35,7 @@ import { OrdersModule } from './orders/orders.module';
 import { ReviewModule } from './review/review.module';
 import { MomoModule } from './payments/momo/momo.module';
 import momoConfig from './config/momo.config';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import momoConfig from './config/momo.config';
     MomoModule,
     OrdersModule,
     ReviewModule,
+    CartModule,
   ],
 })
 export class AppModule {}
