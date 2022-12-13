@@ -57,7 +57,7 @@ export class FilesService extends BaseService<
   }
 
   async uploadFiles(files): Promise<FileEntity[]> {
-    const uploadPromise = files.map((file) => this.uploadFile(file));
+    const uploadPromise = files?.map((file) => this.uploadFile(file));
     return await Promise.all(uploadPromise);
   }
 }

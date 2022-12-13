@@ -13,7 +13,10 @@ import { IsNotExist } from 'src/utils/validators/is-not-exists.validator';
 import { Banner } from 'src/banner/entities/banner.entity';
 
 export class CreateCategoriesDto {
-  @ApiProperty()
+  @ApiProperty({
+    required: true,
+    example: 'Iphone',
+  })
   @IsNotEmpty()
   @Validate(IsNotExist, ['Categories'], {
     message: 'Name already exists',
@@ -21,7 +24,9 @@ export class CreateCategoriesDto {
   name: string;
 
   @ApiProperty({
+    required: true,
     description: 'ID of file',
+    example: 'a62cf20f-abe3-4de6-b486-1fd3982c52e9',
   })
   @IsUUID()
   @Validate(IsExist, ['FileEntity', 'id'], {
@@ -29,14 +34,15 @@ export class CreateCategoriesDto {
   })
   logo: string;
 
-  @ApiProperty({ type: Array<number> })
+  @ApiProperty({ type: Array<number>, example: [1, 2] })
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
   banners: Banner[] | number[];
 
   @ApiProperty({
-    example: 'ID of status',
+    description: 'ID of status',
+    example: 1,
   })
   @IsNumber()
   @Validate(IsExist, ['Status', 'id'], {
