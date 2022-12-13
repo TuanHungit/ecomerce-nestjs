@@ -150,10 +150,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         ...product,
         ratingAvg: Math.round(ratingAvg * 10) / 10,
         statisticReview: reviews,
-        // tierModel: {
-        //   ...deepCloneObject(product.tierModel),
-        //   models: product.models,
-        // },
       },
       {
         excludeExtraneousValues: true,

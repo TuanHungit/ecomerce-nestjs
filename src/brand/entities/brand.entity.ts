@@ -35,11 +35,6 @@ export class Brand extends EntityHelper {
   @JoinColumn()
   image: FileEntity | string;
 
-  // @OneToMany(() => BrandsCategories, (bc) => bc.brand, {
-  //   cascade: ['insert'],
-  // })
-  // brandsCategories: BrandsCategories[] | number[];
-
   @ManyToMany(() => Categories, {
     cascade: true,
   })

@@ -82,7 +82,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.categoriesService.delete(id);
+  remove(@Param('id') id: string) {
+    return this.categoriesService.changeStatus(id);
   }
 }
