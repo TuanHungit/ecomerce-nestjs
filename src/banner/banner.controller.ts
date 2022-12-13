@@ -82,6 +82,6 @@ export class BannerController {
 
   @Delete(':id')
   remove(@Param('id') id: number) {
-    return this.bannerService.delete(id);
+    return this.bannerService.changeStatus(id);
   }
 }

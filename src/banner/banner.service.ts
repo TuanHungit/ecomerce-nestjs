@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { get } from 'lodash';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { DeepPartial, Repository } from 'typeorm';
 import { BaseService } from './../shared/services/base.service';
@@ -39,5 +40,19 @@ export class BannerService extends BaseService<Banner, Repository<Banner>> {
       },
     };
     return await super.findManyWithPagination(paginationOptions, null, wheres);
+  }
+
+  async changeStatus(id: number): Promise<boolean> {
+    const product = await super.findOne({ id });
+    const newStatus = get(product, 'status.id') === 2 ? 1 : 2;
+    const { affected } = await this.bannerRepository.update(
+      {
+        id,
+      },
+      {
+        status: newStatus,
+      },
+    );
+    return affected === 1 ? true : false;
   }
 }

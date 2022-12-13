@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { get } from 'lodash';
 import { BannerService } from 'src/banner/banner.service';
 import { BaseService } from 'src/shared/services/base.service';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
@@ -16,10 +17,10 @@ export class CategoriesService extends BaseService<
 > {
   constructor(
     @InjectRepository(Categories)
-    private categoriesService: Repository<Categories>,
+    private categoriesRepository: Repository<Categories>,
     private bannerService: BannerService,
   ) {
-    super(categoriesService, 'categories');
+    super(categoriesRepository, 'categories');
   }
 
   async createWithBanners(data: CreateCategoriesDto): Promise<Categories> {
@@ -72,5 +73,19 @@ export class CategoriesService extends BaseService<
       },
     };
     return await super.findManyWithPagination(paginationOptions, null, wheres);
+  }
+
+  async changeStatus(id: string): Promise<boolean> {
+    const product = await super.findOne({ id });
+    const newStatus = get(product, 'status.id') === 2 ? 1 : 2;
+    const { affected } = await this.categoriesRepository.update(
+      {
+        id,
+      },
+      {
+        status: newStatus,
+      },
+    );
+    return affected === 1 ? true : false;
   }
 }

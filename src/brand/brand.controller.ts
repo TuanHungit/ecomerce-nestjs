@@ -81,7 +81,7 @@ export class BrandController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.brandService.delete(id);
+  remove(@Param('id') id: string) {
+    return this.brandService.changeStatus(id);
   }
 }
