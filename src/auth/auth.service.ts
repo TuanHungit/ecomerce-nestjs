@@ -34,7 +34,7 @@ export class AuthService {
     const user = await this.usersService.findOne({
       email: loginDto.email,
     });
-
+    console.log('user', user, user.role.id);
     if (
       !user ||
       (user &&

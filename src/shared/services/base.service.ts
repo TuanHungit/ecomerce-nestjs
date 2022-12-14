@@ -87,11 +87,11 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     //   : ({
     //       slug: get(fields, 'id'),
     //     } as EntityCondition<T>);
-    const where = {
-      id: get(fields, 'id'),
-    } as EntityCondition<T>;
+    // const where = {
+    //   id: get(fields, 'id'),
+    // } as EntityCondition<T>;
     const entity = await this.repository.findOne({
-      where: where,
+      where: fields,
       ...(!relations
         ? { loadEagerRelations: true }
         : {

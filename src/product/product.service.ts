@@ -48,14 +48,16 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
       id: StatusEnum.active,
       name: 'Active',
     };
-    console.log('tierModels', tierModels);
-    const tierModelsPromise = await tierModels.map(async (tier) => {
+    // console.log('tierModels', tierModels);
+    const tierModelsPromise = tierModels.map(async (tier) => {
+      // console.log('tier', tier);
       let tierModelEntity = new TierModel();
       // find tier-model by name
       try {
         tierModelEntity = await this.tierModelService.findOne({
           name: tier.tierModel as string,
         });
+        console.log('tierModelEntity', tierModelEntity, tier.tierModel);
         if (!tierModelEntity) {
           throw new Exception('Tier model not found!');
         }
@@ -97,7 +99,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
 
       try {
         tierModelEntity.models = await Promise.all(modelPromises);
-        console.log('tierModelEntity.models', tierModelEntity.models);
+        // console.log('tierModelEntity.models', tierModelEntity.models);
       } catch (err) {
         throw new HttpException(
           {
@@ -109,12 +111,13 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
           HttpStatus.BAD_REQUEST,
         );
       }
+
       return await this.tierModelService.create(tierModelEntity);
     });
 
     data.tierModels = await Promise.all(tierModelsPromise);
-    console.log('savedTierModels', data.tierModels);
-    console.log('savedModels', get(data.tierModels, '[0].models'));
+    // console.log('savedTierModels', data.tierModels);
+    // console.log('savedModels', get(data.tierModels, '[0].models'));
     // find images
     await Promise.all(
       data.images?.map((id) => {
@@ -123,7 +126,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     ).then((res) => {
       data.images = res;
     });
-    console.log('data', data.tierModels[0].models);
+    // console.log('data', data.tierModels[0].models);
     return super.create(data);
   }
 
