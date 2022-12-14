@@ -17,6 +17,7 @@ export class IsExist implements ValidatorConstraintInterface {
 
   async validate(value: string, validationArguments: ValidationArguments) {
     try {
+      console.log('asd', value, validationArguments);
       const repository = validationArguments.constraints[0];
       const pathToProperty = validationArguments.constraints[1];
       const entity: unknown = await this.dataSource
@@ -30,8 +31,10 @@ export class IsExist implements ValidatorConstraintInterface {
           },
           loadEagerRelations: false,
         });
+      console.log('entity', entity);
       return Boolean(entity);
     } catch (err) {
+      console.log(err);
       return false;
     }
   }

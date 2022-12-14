@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { get } from 'lodash';
 import { Repository } from 'typeorm';
 import { AddProductRequestDto } from './dto/add-product-request.dto';
+import { DeleteProductRequestDto } from './dto/delete-product-request.dto';
 import { UpdateQuantityRequestDto } from './dto/update-quantity-request.dto';
 import { Cart } from './entity/cart.entity';
 
@@ -73,5 +74,49 @@ export class CartService {
     }
     const { affected } = await query.execute();
     return affected === 1;
+  }
+
+  async deleteProduct(dto: DeleteProductRequestDto) {
+    const { userId, products } = dto;
+    if (!products) {
+      const { affected } = await this.cartRepository
+        .createQueryBuilder('cart')
+        .delete()
+        .from(Cart)
+        .where({
+          userId,
+        })
+        .execute();
+      return { deletedTotal: affected };
+    }
+    const deletedProductPromise = products?.map((product) => {
+      const { productId, modelId, tierModelId } = product;
+      const query = this.cartRepository
+        .createQueryBuilder('cart')
+        .delete()
+        .from(Cart)
+        .where({
+          userId,
+        })
+        .andWhere(`cart.product ->> 'id' =:productId`, {
+          productId,
+        });
+      if (modelId && tierModelId) {
+        query
+          .andWhere(`cart.product -> 'tierModel' ->> 'id' =:tierModelId`, {
+            tierModelId,
+          })
+          .andWhere(
+            `cart.product -> 'tierModel' -> 'model' ->> 'id' =:modelId`,
+            {
+              modelId,
+            },
+          );
+      }
+      return query.execute();
+    });
+
+    const [{ affected }] = await Promise.all(deletedProductPromise);
+    return { deletedTotal: affected };
   }
 }

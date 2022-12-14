@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CartService } from './cart.service';
 import { AddProductRequestDto } from './dto/add-product-request.dto';
+import { DeleteProductRequestDto } from './dto/delete-product-request.dto';
 import { UpdateQuantityRequestDto } from './dto/update-quantity-request.dto';
 
 @ApiTags('Carts')
@@ -30,5 +31,16 @@ export class CartController {
   ): Promise<boolean> {
     updateQuantityRequestDto.userId = request.user.id;
     return await this.cartService.updateQuantity(updateQuantityRequestDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('delete-product')
+  async deleteProduct(
+    @Request() request,
+    @Body() deleteProductRequestDto: DeleteProductRequestDto,
+  ): Promise<unknown> {
+    deleteProductRequestDto.userId = request.user.id;
+    return await this.cartService.deleteProduct(deleteProductRequestDto);
   }
 }

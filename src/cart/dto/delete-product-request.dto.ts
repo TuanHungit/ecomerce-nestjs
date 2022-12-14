@@ -2,9 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, Validate } from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 
-export class UpdateQuantityRequestDto {
-  userId: number;
-
+class DeleteProductDto {
   @ApiProperty({
     required: true,
     example: 1,
@@ -14,14 +12,6 @@ export class UpdateQuantityRequestDto {
     message: 'Product not exists',
   })
   productId: number;
-
-  @ApiProperty({
-    required: true,
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  quantity: number;
 
   @ApiProperty({
     example: 1,
@@ -42,4 +32,16 @@ export class UpdateQuantityRequestDto {
     message: 'Tier model not exists',
   })
   tierModelId?: number;
+}
+
+export class DeleteProductRequestDto {
+  userId: number;
+
+  @ApiProperty({
+    required: true,
+    type: DeleteProductDto,
+    isArray: true,
+  })
+  @IsOptional()
+  products: DeleteProductDto[];
 }
