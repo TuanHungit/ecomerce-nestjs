@@ -80,13 +80,16 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     relations?: string[],
   ): Promise<T> {
     const isSlug = isNaN(+get(fields, 'id'));
-    const where = !isSlug
-      ? ({
-          id: get(fields, 'id'),
-        } as EntityCondition<T>)
-      : ({
-          slug: get(fields, 'id'),
-        } as EntityCondition<T>);
+    // const where = !isSlug
+    //   ? ({
+    //       id: get(fields, 'id'),
+    //     } as EntityCondition<T>)
+    //   : ({
+    //       slug: get(fields, 'id'),
+    //     } as EntityCondition<T>);
+    const where = {
+      id: get(fields, 'id'),
+    } as EntityCondition<T>;
     const entity = await this.repository.findOne({
       where: where,
       ...(!relations
