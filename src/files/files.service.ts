@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { BaseService } from 'src/shared/services/base.service';
 import { FileType } from './file.constant';
 import { getVideoDuration } from 'src/utils/get-duration-video-file';
+import { get } from 'lodash';
 
 @Injectable()
 export class FilesService extends BaseService<
@@ -32,9 +33,9 @@ export class FilesService extends BaseService<
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-
+    const filePath = (get(file, 'path', '') as string).replace(/\\/g, '/');
     const path = {
-      local: `/${this.configService.get('app.apiPrefix')}/v1/${file.path}`,
+      local: `/${this.configService.get('app.apiPrefix')}/v1/${filePath}`,
       s3: file.location,
     };
 
