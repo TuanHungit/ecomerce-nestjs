@@ -47,6 +47,6 @@ export class Categories extends EntityHelper {
   @BeforeInsert()
   @BeforeUpdate()
   setSlug() {
-    this.slug = `${this.name.split(' ').join('_')}_${new Date().getTime()}`;
+    this.slug = `${this.name?.split(' ').join('_')}_${new Date().getTime()}`;
   }
 }

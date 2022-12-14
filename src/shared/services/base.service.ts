@@ -125,13 +125,17 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     return await this.repository.save(this.repository.create(data));
   }
 
-  async update(id: EntityId, data: any): Promise<T> {
+  async update(id: EntityId, data: any, relations?: string[]): Promise<T> {
     try {
       await this.repository.save(
         this.repository.create({ id, ...data }) as any,
       );
-      return this.findOne([{ id }] as unknown as EntityCondition<T>[]);
+      return this.findOne(
+        [{ id }] as unknown as EntityCondition<T>[],
+        relations,
+      );
     } catch (err) {
+      console.log(err);
       throw new HttpException(
         {
           status: HttpStatus.NOT_FOUND,

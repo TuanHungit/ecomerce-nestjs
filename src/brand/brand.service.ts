@@ -8,6 +8,7 @@ import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { GetBrandDetailReponseDto } from './dto/get-brand-response.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 import { Brand } from './entities/brand.entity';
 
 @Injectable()
@@ -30,6 +31,22 @@ export class BrandService extends BaseService<Brand, Repository<Brand>> {
     });
 
     return super.create(data as DeepPartial<Brand>);
+  }
+
+  async updateWithCategories(id: number, data: UpdateBrandDto): Promise<Brand> {
+    await Promise.all(
+      data.categories?.map((id) => {
+        return this.categoriesService.findOne({ id });
+      }),
+    ).then((res) => {
+      data.categories = res;
+    });
+    return await super.update(id, data, [
+      'categories',
+      'image',
+      'logo',
+      'status',
+    ]);
   }
 
   async getOne(id: string): Promise<GetBrandDetailReponseDto> {

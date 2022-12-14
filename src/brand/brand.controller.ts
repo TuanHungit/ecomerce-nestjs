@@ -77,7 +77,7 @@ export class BrandController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   update(@Param('id') id: number, @Body() updateBannerDto: UpdateBrandDto) {
-    return this.brandService.update(id, updateBannerDto);
+    return this.brandService.updateWithCategories(id, updateBannerDto);
   }
 
   @Delete(':id')

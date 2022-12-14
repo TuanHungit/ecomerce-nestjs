@@ -40,6 +40,8 @@ export class Product extends EntityHelper {
       this.price =
         this.priceBeforeDiscount -
         Math.floor((this.priceBeforeDiscount * this.discount) / 100);
+    } else {
+      this.price = this.priceBeforeDiscount;
     }
   }
 
@@ -104,13 +106,6 @@ export class Product extends EntityHelper {
     eager: true,
   })
   brand: Brand | number;
-
-  // @ApiProperty()
-  // @ManyToOne(() => TierModel, {
-  //   eager: true,
-  // })
-  // @JoinColumn()
-  // tierModel?: TierModel | string | number;
 
   @ManyToMany(() => TierModel, {
     eager: true,
