@@ -5,7 +5,7 @@ import { IsExist } from 'src/utils/validators/is-exists.validator';
 class ModelRequestDto {
   @ApiProperty({
     required: true,
-    example: 1,
+    example: '418f79b5-9c62-45ff-933a-08c0d3e17cb9',
   })
   @IsNotEmpty()
   @IsNumber()
@@ -22,7 +22,7 @@ class ModelRequestDto {
 class TierModelRequestDto {
   @ApiProperty({
     required: true,
-    example: 1,
+    example: 'd6c5f97a-77e8-48db-9a64-cc3134febcb7',
   })
   @IsNotEmpty()
   @IsNumber()
@@ -37,9 +37,12 @@ class TierModelRequestDto {
 
   @ApiProperty({
     required: true,
+    type: ModelRequestDto,
   })
   @IsNotEmpty()
-  model: ModelRequestDto;
+  currentModel: ModelRequestDto;
+
+  models: Record<string, unknown>;
 }
 
 class ProductRequestDto {
@@ -62,11 +65,35 @@ class ProductRequestDto {
 
   @ApiProperty({
     required: true,
+    example:
+      'localhost:3000/api/v1/files/23ac18ad-57d8-4960-a021-c2d80fc256f5.jpeg',
+  })
+  @IsNotEmpty()
+  imagePath: string;
+
+  @ApiProperty({
+    required: true,
+    example: 120000,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
+
+  @ApiProperty({
+    required: true,
     example: 150000,
   })
   @IsNotEmpty()
   @IsNumber()
-  amount: number;
+  priceBeforeDiscount: number;
+
+  @ApiProperty({
+    required: true,
+    example: 10,
+  })
+  @IsOptional()
+  @IsNumber()
+  discount: number;
 
   @ApiProperty({
     required: true,

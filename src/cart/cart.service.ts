@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { get } from 'lodash';
+import { castArray, get, pick, set } from 'lodash';
+import { TierModelService } from 'src/tier-model/tier-model.service';
 import { Repository } from 'typeorm';
 import { AddProductRequestDto } from './dto/add-product-request.dto';
 import { DeleteProductRequestDto } from './dto/delete-product-request.dto';
@@ -12,8 +13,28 @@ export class CartService {
   constructor(
     @InjectRepository(Cart)
     private cartRepository: Repository<Cart>,
+    private tierModelService: TierModelService,
   ) {}
 
+  async getCart(userId: number) {
+    const cart = await this.cartRepository.find({
+      where: {
+        userId,
+      },
+    });
+    const promises = cart?.map(async (el) => {
+      const tierModelId = get(el, 'product.tierModel.id');
+      const tierModel = await this.tierModelService.findOne({
+        id: tierModelId,
+      });
+      const models = castArray(get(tierModel, 'models', [])).map((el) =>
+        pick(el, ['id', 'name']),
+      );
+      set(el, 'product.tierModel.models', models);
+      return el;
+    });
+    return await Promise.all(promises);
+  }
   async addProduct(
     addProductRequestDto: AddProductRequestDto,
   ): Promise<boolean> {
@@ -68,9 +89,12 @@ export class CartService {
         .andWhere(`cart.product -> 'tierModel' ->> 'id' =:tierModelId`, {
           tierModelId,
         })
-        .andWhere(`cart.product -> 'tierModel' -> 'model' ->> 'id' =:modelId`, {
-          modelId,
-        });
+        .andWhere(
+          `cart.product -> 'tierModel' -> 'currentModel' ->> 'id' =:modelId`,
+          {
+            modelId,
+          },
+        );
     }
     const { affected } = await query.execute();
     return affected === 1;
@@ -107,7 +131,7 @@ export class CartService {
             tierModelId,
           })
           .andWhere(
-            `cart.product -> 'tierModel' -> 'model' ->> 'id' =:modelId`,
+            `cart.product -> 'tierModel' -> 'currentModel' ->> 'id' =:modelId`,
             {
               modelId,
             },

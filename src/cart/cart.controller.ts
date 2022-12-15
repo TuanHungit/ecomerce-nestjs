@@ -43,4 +43,11 @@ export class CartController {
     deleteProductRequestDto.userId = request.user.id;
     return await this.cartService.deleteProduct(deleteProductRequestDto);
   }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('me')
+  async getCart(@Request() request): Promise<unknown> {
+    return await this.cartService.getCart(request.user.id);
+  }
 }

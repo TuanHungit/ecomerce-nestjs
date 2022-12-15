@@ -24,7 +24,7 @@ export class UpdateQuantityRequestDto {
   quantity: number;
 
   @ApiProperty({
-    example: 1,
+    example: '418f79b5-9c62-45ff-933a-08c0d3e17cb9',
   })
   @IsOptional()
   @IsNumber()
@@ -34,7 +34,7 @@ export class UpdateQuantityRequestDto {
   modelId?: number;
 
   @ApiProperty({
-    example: 1,
+    example: 'd6c5f97a-77e8-48db-9a64-cc3134febcb7',
   })
   @IsOptional()
   @IsNumber()

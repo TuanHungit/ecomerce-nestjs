@@ -19,7 +19,7 @@ import {
   Between,
   FindOptionsOrder,
   FindOptionsWhere,
-  Like,
+  ILike,
   Repository,
 } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -205,7 +205,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     if (likes) {
       likes.forEach((el: string) => {
         if (wheres[el]) {
-          wheres[el] = Like(`%${wheres[el]}%`);
+          wheres[el] = ILike(`%${wheres[el]}%`);
         }
       });
     }
@@ -220,6 +220,9 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         searchProductDto.fromPrice,
         searchProductDto.toPrice,
       );
+    }
+    if (searchProductDto.keyword) {
+      wheres.name = ILike(`%${searchProductDto.keyword}%`);
     }
     wheres.status = 1;
     let totalPages = 1;
