@@ -61,7 +61,9 @@ export class Product extends EntityHelper {
   image: FileEntity | string;
 
   @ApiProperty()
-  @ManyToMany(() => FileEntity)
+  @ManyToMany(() => FileEntity, {
+    eager: true,
+  })
   @JoinTable()
   images: FileEntity[] | string[];
 
