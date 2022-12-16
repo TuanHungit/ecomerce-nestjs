@@ -2,7 +2,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { omit, pick } from 'lodash';
 import { FilesService } from 'src/files/files.service';
-import { Product } from 'src/product/entity/product.entity';
+import { ProductService } from 'src/product/product.service';
 import { BaseService } from 'src/shared/services/base.service';
 import { StatusEnum } from 'src/statuses/statuses.enum';
 import { infinityPagination } from 'src/utils/infinity-pagination';
@@ -15,20 +15,16 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
   constructor(
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
-    @InjectRepository(Product)
-    private productRepository: Repository<Product>,
     private fileService: FilesService,
+    private productService: ProductService,
   ) {
     super(reviewRepository, 'review');
   }
 
   async create(data: CreateReviewDto) {
-    const product = await this.productRepository.findOne({
-      where: {
-        id: data.productId,
-      },
+    const product = await this.productService.findOne({
+      id: data.productId,
     });
-
     data.product = {
       ...pick(product, ['id', 'name']),
     };
@@ -46,7 +42,26 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
       name: 'Active',
     };
     const dataToSave = omit(data, ['productId', 'userId']);
-    return super.create(dataToSave);
+    const result = await super.create(dataToSave);
+
+    // statistics by rating
+    const reviews = await this.statisticsByRatingAndProduct(product.id);
+    const ratingTotal = reviews?.reduce((prev, cur) => {
+      return prev + cur.rating * +cur.total;
+    }, 0);
+    const reviewTotal = reviews?.reduce((prev, cur) => {
+      return prev + +cur.total;
+    }, 0);
+    await this.productService.update(product.id, {
+      ...data,
+      params: {
+        ...product.params,
+        reviewTotal,
+        ratingAvg: Math.round((ratingTotal / reviewTotal) * 10) / 10,
+        statisticReview: reviews,
+      },
+    });
+    return result;
   }
 
   async search(
@@ -123,7 +138,7 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
   async statisticsByRatingAndProduct(productId: number) {
     const reviews = await this.reviewRepository
       .createQueryBuilder('review')
-      .select('COUNT(review.id)', 'totalReview')
+      .select('COUNT(review.id)', 'total')
       .addSelect('review.rating', 'rating')
       .where(`review.product ->> 'id' =:productId`, {
         productId,

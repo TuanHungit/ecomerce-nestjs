@@ -1,4 +1,4 @@
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
 class FileResponse {
   @Expose()
@@ -141,8 +141,7 @@ export class ProductResponseDto {
   slug?: string;
 
   @Expose()
-  @Transform(({ obj }) => obj.status.name)
-  status?: string;
+  params?: Record<string, unknown>;
 
   @Expose()
   createdAt: Date;

@@ -57,6 +57,7 @@ export class ProductController {
       { ...filters } as EntityCondition<Product>,
       { [column]: sort },
       ['name'],
+      ['image'],
     );
   }
 

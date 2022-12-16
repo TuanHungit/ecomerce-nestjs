@@ -30,7 +30,7 @@ export class Product extends EntityHelper {
   @BeforeInsert()
   @BeforeUpdate()
   setSlug() {
-    this.slug = `${this.name.split(' ').join('_')}_${new Date().getTime()}`;
+    this.slug = `${this.name?.split(' ').join('_')}_${new Date().getTime()}`;
   }
 
   @BeforeInsert()
@@ -126,6 +126,10 @@ export class Product extends EntityHelper {
   @ApiProperty()
   @Column('jsonb', { nullable: true })
   keywords?: string[] | null;
+
+  @ApiProperty()
+  @Column('jsonb', { nullable: true, default: {} })
+  params?: Record<string, unknown>;
 
   @ApiProperty()
   @Column({ nullable: true })

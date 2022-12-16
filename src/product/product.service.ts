@@ -7,7 +7,6 @@ import { FilesService } from 'src/files/files.service';
 import { CreateModelDto } from 'src/model/dto/create-model.dto';
 import { Model } from 'src/model/entities/model.entity';
 import { ModelService } from 'src/model/model.service';
-import { ReviewService } from 'src/review/review.service';
 import { BaseService } from 'src/shared/services/base.service';
 import { StatusEnum } from 'src/statuses/statuses.enum';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
@@ -35,8 +34,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     private modelService: ModelService,
     private tierModelService: TierModelService,
     private fileService: FilesService,
-    private userService: UsersService,
-    private reviewService: ReviewService,
+    private userService: UsersService, // private reviewService: ReviewService,
   ) {
     super(productRepository, 'product');
   }
@@ -133,31 +131,9 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
   async getOne(productId: number): Promise<ProductResponseDto> {
     //* get product
     const product = await super.findOne({ id: productId });
-
-    //* get review
-    const reviews = await this.reviewService.statisticsByRatingAndProduct(
-      productId,
-    );
-
-    const ratingAvg =
-      reviews?.reduce((prev, cur) => {
-        return prev + cur.rating * +cur.totalReview;
-      }, 0) /
-      reviews?.reduce((prev, cur) => {
-        return prev + +cur.totalReview;
-      }, 0);
-    console.log('product', product);
-    return plainToClass(
-      ProductResponseDto,
-      {
-        ...product,
-        ratingAvg: Math.round(ratingAvg * 10) / 10,
-        statisticReview: reviews,
-      },
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+    return plainToClass(ProductResponseDto, product, {
+      excludeExtraneousValues: true,
+    });
   }
 
   filers(searchProductDto: SearchProductDto) {

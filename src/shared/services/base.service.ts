@@ -34,6 +34,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     wheres?: FindOptionsWhere<T>,
     orders?: FindOptionsOrder<T>,
     likes?: (keyof T)[],
+    relations?: string[],
   ) {
     const selects: (keyof T)[] = [];
     if (fields) {
@@ -69,6 +70,12 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
         where: wheres,
         order: orders,
         cache: true,
+        ...(!relations
+          ? { loadEagerRelations: true }
+          : {
+              loadEagerRelations: false,
+              relations,
+            }),
       }),
       totalPages,
       paginationOptions,
