@@ -21,6 +21,11 @@ export class Model extends EntityHelper {
   @Column()
   price?: number;
 
+  @Column({
+    nullable: true,
+  })
+  parent: string;
+
   @Column()
   priceBeforeDiscount: number;
 

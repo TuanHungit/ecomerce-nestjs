@@ -116,7 +116,8 @@ export class AddProductRequestDto {
 
   @ApiProperty({
     type: TierModelRequestDto,
+    isArray: true,
   })
   @IsOptional()
-  tierModel?: TierModelRequestDto;
+  tierModel?: TierModelRequestDto[];
 }

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { castArray, get, pick, set } from 'lodash';
+import { castArray, get, isEmpty, pick, set } from 'lodash';
 import { TierModelService } from 'src/tier-model/tier-model.service';
 import { Repository } from 'typeorm';
 import { AddProductRequestDto } from './dto/add-product-request.dto';
@@ -39,20 +39,22 @@ export class CartService {
     addProductRequestDto: AddProductRequestDto,
   ): Promise<boolean> {
     const { userId, product, tierModel } = addProductRequestDto;
-    const isProductExists = await this.updateQuantity({
-      userId,
-      productId: product.id,
-      tierModelId: tierModel?.id,
-      modelId: get(tierModel, 'model.id'),
-      quantity: product.quantity,
-    });
-    if (isProductExists) {
-      return true;
-    }
+    // const isProductExists = await this.updateQuantity({
+    //   userId,
+    //   productId: product.id,
+    //   tierModelId: 0,
+    //   modelId: get(tierModel, 'model.id'),
+    //   quantity: product.quantity,
+    // });
+    // if (isProductExists) {
+    //   return true;
+    // }
+    const tierModelIds = castArray(tierModel).map((tier) => tier?.id);
     const dataToSave = {
       userId,
       product: {
         ...product,
+        tierModelIds,
         tierModel: tierModel,
       },
     };
@@ -64,8 +66,7 @@ export class CartService {
   async updateQuantity(
     updateQuantityRequestDto: UpdateQuantityRequestDto,
   ): Promise<boolean> {
-    const { userId, productId, modelId, tierModelId, quantity } =
-      updateQuantityRequestDto;
+    const { userId, productId, tierModel, quantity } = updateQuantityRequestDto;
     if (quantity <= 0) {
       throw new BadRequestException('Quantity must be greater than 0');
     }
@@ -84,17 +85,16 @@ export class CartService {
       .andWhere(`cart.product ->> 'id' =:productId`, {
         productId,
       });
-    if (modelId && tierModelId) {
-      query
-        .andWhere(`cart.product -> 'tierModel' ->> 'id' =:tierModelId`, {
-          tierModelId,
-        })
-        .andWhere(
-          `cart.product -> 'tierModel' -> 'currentModel' ->> 'id' =:modelId`,
-          {
-            modelId,
-          },
-        );
+    if (!isEmpty(tierModel)) {
+      // query.andWhere(`cart.product -> 'tierModel' ->> 'id' =:tierModelId`, {
+      //   tierModelId,
+      // });
+      // .andWhere(
+      //   `cart.product -> 'tierModel' -> 'currentModel' ->> 'id' =:modelId`,
+      //   {
+      //     modelId,
+      //   },
+      // );
     }
     const { affected } = await query.execute();
     return affected === 1;

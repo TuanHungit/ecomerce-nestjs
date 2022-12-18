@@ -63,8 +63,14 @@ class ModelResponse {
 
   @Expose()
   image?: string;
+
+  @Expose()
+  parent: string;
 }
 class TierModelResponse {
+  @Expose()
+  id: string;
+
   @Expose()
   name: string;
 
