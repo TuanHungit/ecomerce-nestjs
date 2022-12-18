@@ -91,7 +91,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
               Math.floor((modelDto.priceBeforeDiscount * data.discount) / 100),
             status,
           };
-          console.log('model', model);
           return this.modelService.create(model);
         },
       );
