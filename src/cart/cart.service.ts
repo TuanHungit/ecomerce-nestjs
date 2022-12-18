@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { castArray, get, isEmpty, pick, set } from 'lodash';
+import { castArray, get, pick, set, unset } from 'lodash';
 import { TierModelService } from 'src/tier-model/tier-model.service';
 import { Repository } from 'typeorm';
 import { AddProductRequestDto } from './dto/add-product-request.dto';
@@ -31,30 +31,37 @@ export class CartService {
         pick(el, ['id', 'name']),
       );
       set(el, 'product.tierModel.models', models);
+      unset(el, 'product.cartId');
       return el;
     });
     return await Promise.all(promises);
   }
+
   async addProduct(
     addProductRequestDto: AddProductRequestDto,
   ): Promise<boolean> {
     const { userId, product, tierModel } = addProductRequestDto;
-    // const isProductExists = await this.updateQuantity({
-    //   userId,
-    //   productId: product.id,
-    //   tierModelId: 0,
-    //   modelId: get(tierModel, 'model.id'),
-    //   quantity: product.quantity,
-    // });
-    // if (isProductExists) {
-    //   return true;
-    // }
-    const tierModelIds = castArray(tierModel).map((tier) => tier?.id);
+    const tierModelIds = tierModel.map((tier) => ({
+      id: tier.id,
+      modelId: tier.currentModel.id,
+    }));
+    const cartId = this.genCartId(userId, product.id, tierModelIds);
+    const existedCart = await this.findCart(userId, cartId);
+    console.log('existedCart', existedCart);
+    if (existedCart) {
+      await this.updateQuantity({
+        userId,
+        productId: product.id,
+        tierModels: tierModelIds,
+        quantity: product.quantity + get(existedCart, 'product.quantity'),
+      });
+      if (existedCart) return true;
+    }
     const dataToSave = {
       userId,
       product: {
         ...product,
-        tierModelIds,
+        cartId,
         tierModel: tierModel,
       },
     };
@@ -65,14 +72,26 @@ export class CartService {
 
   async updateQuantity(
     updateQuantityRequestDto: UpdateQuantityRequestDto,
+    cartId?: string,
   ): Promise<boolean> {
-    const { userId, productId, tierModel, quantity } = updateQuantityRequestDto;
+    const { userId, productId, tierModels, quantity } =
+      updateQuantityRequestDto;
     if (quantity <= 0) {
       throw new BadRequestException('Quantity must be greater than 0');
     }
     if (quantity === 0) {
       // delete product on cart
     }
+    let generatedCardId = cartId;
+    if (!generatedCardId) {
+      generatedCardId = this.genCartId(
+        userId,
+        productId,
+        tierModels as Record<string, unknown>[],
+      );
+      console.log('cartId', generatedCardId);
+    }
+
     const query = this.cartRepository
       .createQueryBuilder('cart')
       .update(Cart)
@@ -82,20 +101,9 @@ export class CartService {
       .set({
         product: () => `jsonb_set(product::jsonb, '{quantity}', '${quantity}')`,
       })
-      .andWhere(`cart.product ->> 'id' =:productId`, {
-        productId,
+      .andWhere(`cart.product ->> 'cartId' =:cartId`, {
+        cartId: generatedCardId,
       });
-    if (!isEmpty(tierModel)) {
-      // query.andWhere(`cart.product -> 'tierModel' ->> 'id' =:tierModelId`, {
-      //   tierModelId,
-      // });
-      // .andWhere(
-      //   `cart.product -> 'tierModel' -> 'currentModel' ->> 'id' =:modelId`,
-      //   {
-      //     modelId,
-      //   },
-      // );
-    }
     const { affected } = await query.execute();
     return affected === 1;
   }
@@ -114,33 +122,52 @@ export class CartService {
       return { deletedTotal: affected };
     }
     const deletedProductPromise = products?.map((product) => {
-      const { productId, modelId, tierModelId } = product;
-      const query = this.cartRepository
+      const { productId, tierModels } = product;
+      const cartId = this.genCartId(
+        userId,
+        productId,
+        tierModels as Record<string, unknown>[],
+      );
+      console.log('cartId', cartId);
+      return this.cartRepository
         .createQueryBuilder('cart')
         .delete()
         .from(Cart)
         .where({
           userId,
         })
-        .andWhere(`cart.product ->> 'id' =:productId`, {
-          productId,
-        });
-      if (modelId && tierModelId) {
-        query
-          .andWhere(`cart.product -> 'tierModel' ->> 'id' =:tierModelId`, {
-            tierModelId,
-          })
-          .andWhere(
-            `cart.product -> 'tierModel' -> 'currentModel' ->> 'id' =:modelId`,
-            {
-              modelId,
-            },
-          );
-      }
-      return query.execute();
+        .andWhere(`cart.product ->> 'cartId' =:cartId`, {
+          cartId,
+        })
+        .execute();
     });
 
     const [{ affected }] = await Promise.all(deletedProductPromise);
     return { deletedTotal: affected };
+  }
+
+  findCart(userId: number, cartId: string) {
+    return this.cartRepository
+      .createQueryBuilder('cart')
+      .select()
+      .where({
+        userId,
+      })
+      .andWhere(`cart.product ->> 'cartId' =:cartId`, {
+        cartId,
+      })
+      .getOne();
+  }
+
+  genCartId(
+    userId: number,
+    productId: number,
+    tierModel: Record<string, unknown>[],
+  ): string {
+    const tierModelIds = tierModel.map((tier) => `${tier.id},${tier.modelId}`);
+    return tierModelIds
+      .concat([`${productId}`, `${userId}`])
+      .sort()
+      .join(',');
   }
 }
