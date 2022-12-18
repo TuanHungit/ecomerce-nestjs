@@ -24,12 +24,12 @@ import { Review } from './entity/review.entity';
 import { ReviewService } from './review.service';
 
 @ApiTags('Review')
-@ApiBearerAuth()
 @Controller('reviews')
 export class ReviewController {
   constructor(private reviewService: ReviewService) {}
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   create(@Request() request, @Body() createReviewDto: CreateReviewDto) {
     createReviewDto.user = {
@@ -62,6 +62,7 @@ export class ReviewController {
   }
 
   @Post('paging')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   paging(
@@ -86,6 +87,7 @@ export class ReviewController {
   }
 
   @Get(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: number) {
@@ -93,6 +95,7 @@ export class ReviewController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   delete(@Param('id') id: number) {
