@@ -83,7 +83,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
 
       // create model
       const modelPromises: Promise<Model>[] = tier.models?.map(
-        async (modelDto: CreateModelDto) => {
+        (modelDto: CreateModelDto) => {
           const model = {
             ...modelDto,
             price:
@@ -91,7 +91,8 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
               Math.floor((modelDto.priceBeforeDiscount * data.discount) / 100),
             status,
           };
-          return await this.modelService.create(model);
+          console.log('model', model);
+          return this.modelService.create(model);
         },
       );
 
