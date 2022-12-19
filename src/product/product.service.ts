@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
-import { Exception } from 'handlebars';
 import { get, set } from 'lodash';
 import { FilesService } from 'src/files/files.service';
 import { CreateModelDto } from 'src/model/dto/create-model.dto';
@@ -48,37 +47,25 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     };
     // console.log('tierModels', tierModels);
     const tierModelsPromise = tierModels.map(async (tier) => {
-      // console.log('tier', tier);
       let tierModelEntity = new TierModel();
-      // find tier-model by name
-      try {
-        tierModelEntity = await this.tierModelService.findOne({
-          name: tier.tierModel as string,
-        });
-        console.log('tierModelEntity', tierModelEntity, tier.tierModel);
-        if (!tierModelEntity) {
-          throw new Exception('Tier model not found!');
-        }
-      } catch (err) {
-        tierModelEntity.name = tier.tierModel as string;
-        tierModelEntity.status = status;
+      tierModelEntity.name = tier.tierModel as string;
+      tierModelEntity.status = status;
 
-        try {
-          const newTierModel = await this.tierModelService.create(
-            tierModelEntity,
-          );
-          tierModelEntity = newTierModel;
-        } catch (err) {
-          throw new HttpException(
-            {
-              status: HttpStatus.BAD_REQUEST,
-              errors: {
-                message: 'Create tier-model record failed!',
-              },
+      try {
+        const newTierModel = await this.tierModelService.create(
+          tierModelEntity,
+        );
+        tierModelEntity = newTierModel;
+      } catch (err) {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            errors: {
+              message: 'Create tier-model record failed!',
             },
-            HttpStatus.BAD_REQUEST,
-          );
-        }
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // create model
@@ -114,8 +101,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     });
 
     data.tierModels = await Promise.all(tierModelsPromise);
-    // console.log('savedTierModels', data.tierModels);
-    // console.log('savedModels', get(data.tierModels, '[0].models'));
     // find images
     await Promise.all(
       data.images?.map((id) => {
@@ -124,7 +109,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     ).then((res) => {
       data.images = res;
     });
-    // console.log('data', data.tierModels[0].models);
     return super.create(data);
   }
 
@@ -275,14 +259,15 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     return true;
   }
 
-  async purchaseProduct(productId: number, amount: number): Promise<void> {
+  async purchaseProduct(productId: number, quantity: number): Promise<void> {
     try {
       await this.productRepository.update(
         {
           id: productId,
         },
         {
-          sold: () => 'sold' + amount,
+          sold: () => `sold + ${quantity}`,
+          stock: () => `stock - ${quantity}`,
         },
       );
     } catch (error) {

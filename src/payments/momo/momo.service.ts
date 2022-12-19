@@ -26,7 +26,7 @@ export class MomoService {
     createOrderDto.paymentMethod = PAYMENT_TYPE.MOMO;
     createOrderDto.createdBy = data.createdBy;
     //* create pending order
-    const order = await this.orderService.create(createOrderDto);
+    const order = await this.orderService.createOrder(createOrderDto);
 
     //* prepare data to call momo api
     const {

@@ -17,7 +17,7 @@ export class ProductDto {
   @Validate(IsExist, ['Product', 'id'], {
     message: 'Product not exists',
   })
-  productId: string;
+  productId: number;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -30,7 +30,7 @@ export class ProductDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  amount: number;
+  priceBeforeDiscount: number;
 
   @ApiProperty({
     example: 26,

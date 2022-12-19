@@ -23,14 +23,21 @@ export class CartService {
       },
     });
     const promises = cart?.map(async (el) => {
-      const tierModelId = get(el, 'product.tierModel.id');
-      const tierModel = await this.tierModelService.findOne({
-        id: tierModelId,
+      const tierModels = castArray(get(el, 'product.tierModel'));
+      const newTierModels = tierModels.map(async (tier) => {
+        console.log('tier', tier);
+        const tierModel = await this.tierModelService.findOne({
+          id: tier.id,
+        });
+        console.log('tierModel', tierModel);
+        const models = castArray(get(tierModel, 'models', [])).map((el) =>
+          pick(el, ['id', 'name']),
+        );
+        set(tier, 'models', models);
+        console.log('tier', tier);
+        return tier;
       });
-      const models = castArray(get(tierModel, 'models', [])).map((el) =>
-        pick(el, ['id', 'name']),
-      );
-      set(el, 'product.tierModel.models', models);
+      set(el, 'product.tierModel', await Promise.all(newTierModels));
       unset(el, 'product.cartId');
       return el;
     });
@@ -39,7 +46,7 @@ export class CartService {
 
   async addProduct(
     addProductRequestDto: AddProductRequestDto,
-  ): Promise<boolean> {
+  ): Promise<unknown> {
     const { userId, product, tierModel } = addProductRequestDto;
     const tierModelIds = tierModel.map((tier) => ({
       id: tier.id,
@@ -47,15 +54,13 @@ export class CartService {
     }));
     const cartId = this.genCartId(userId, product.id, tierModelIds);
     const existedCart = await this.findCart(userId, cartId);
-    console.log('existedCart', existedCart);
     if (existedCart) {
-      await this.updateQuantity({
+      return await this.updateQuantity({
         userId,
         productId: product.id,
         tierModels: tierModelIds,
         quantity: product.quantity + get(existedCart, 'product.quantity'),
       });
-      if (existedCart) return true;
     }
     const dataToSave = {
       userId,
@@ -65,15 +70,15 @@ export class CartService {
         tierModel: tierModel,
       },
     };
-    return !!(await this.cartRepository.save(
+    return await this.cartRepository.save(
       this.cartRepository.create(dataToSave),
-    ));
+    );
   }
 
   async updateQuantity(
     updateQuantityRequestDto: UpdateQuantityRequestDto,
     cartId?: string,
-  ): Promise<boolean> {
+  ): Promise<unknown> {
     const { userId, productId, tierModels, quantity } =
       updateQuantityRequestDto;
     if (quantity <= 0) {
@@ -89,10 +94,9 @@ export class CartService {
         productId,
         tierModels as Record<string, unknown>[],
       );
-      console.log('cartId', generatedCardId);
     }
 
-    const query = this.cartRepository
+    await this.cartRepository
       .createQueryBuilder('cart')
       .update(Cart)
       .where({
@@ -103,9 +107,15 @@ export class CartService {
       })
       .andWhere(`cart.product ->> 'cartId' =:cartId`, {
         cartId: generatedCardId,
-      });
-    const { affected } = await query.execute();
-    return affected === 1;
+      })
+      .execute();
+    return await this.cartRepository
+      .createQueryBuilder('cart')
+      .select()
+      .where(`cart.product ->> 'cartId' =:cartId`, {
+        cartId: generatedCardId,
+      })
+      .getOne();
   }
 
   async deleteProduct(dto: DeleteProductRequestDto) {
@@ -128,7 +138,6 @@ export class CartService {
         productId,
         tierModels as Record<string, unknown>[],
       );
-      console.log('cartId', cartId);
       return this.cartRepository
         .createQueryBuilder('cart')
         .delete()

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { get } from 'lodash';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
@@ -86,7 +85,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     fields: EntityCondition<T> | EntityCondition<T>[],
     relations?: string[],
   ): Promise<T> {
-    const isSlug = isNaN(+get(fields, 'id'));
+    // const isSlug = isNaN(+get(fields, 'id'));
     // const where = !isSlug
     //   ? ({
     //       id: get(fields, 'id'),
@@ -111,9 +110,9 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     Object.keys(fields).forEach((key) => {
       error += `${key} = ${fields[key]}`;
     });
-    if (isSlug) {
-      error = error?.replace(' id = ', ' slug = ');
-    }
+    // if (isSlug) {
+    //   error = error?.replace(' id = ', ' slug = ');
+    // }
     if (!entity) {
       throw new HttpException(
         {

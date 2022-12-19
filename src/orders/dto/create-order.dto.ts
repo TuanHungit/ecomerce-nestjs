@@ -7,6 +7,7 @@ import {
   Validate,
 } from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { OrderProducts } from '../entity/order-products.entity';
 
 export class ProductDto {
   @ApiProperty()
@@ -14,7 +15,7 @@ export class ProductDto {
   @Validate(IsExist, ['Product', 'id'], {
     message: 'Product not exists',
   })
-  productId: string;
+  productId: number;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -24,7 +25,7 @@ export class ProductDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  amount: number;
+  priceBeforeDiscount: number;
 
   @ApiProperty()
   @IsOptional()
@@ -42,7 +43,7 @@ export class CreateOrderDto {
   })
   @IsNotEmpty()
   @IsArray()
-  products: ProductDto[];
+  products: ProductDto[] | OrderProducts[];
 
   userId: string;
 

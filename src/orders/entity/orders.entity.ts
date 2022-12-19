@@ -1,12 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Product } from 'src/product/entity/product.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -29,21 +26,6 @@ export class Orders extends BaseEntity {
   @ApiProperty()
   @Column()
   userId: string;
-
-  @ApiProperty()
-  @ManyToMany(() => Product)
-  @JoinTable({
-    name: 'order_products',
-    joinColumn: {
-      name: 'orderId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'productId',
-      referencedColumnName: 'id',
-    },
-  })
-  products: Product[];
 
   @ApiProperty()
   @Column({ type: 'enum', enum: ORDER_TYPE, default: ORDER_TYPE.UNPAID })

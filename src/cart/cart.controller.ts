@@ -7,7 +7,10 @@ import { DeleteProductRequestDto } from './dto/delete-product-request.dto';
 import { UpdateQuantityRequestDto } from './dto/update-quantity-request.dto';
 
 @ApiTags('Carts')
-@Controller('carts')
+@Controller({
+  path: 'carts',
+  version: '1',
+})
 export class CartController {
   constructor(private cartService: CartService) {}
 
@@ -17,7 +20,7 @@ export class CartController {
   async addProduct(
     @Request() request,
     @Body() addProductRequestDto: AddProductRequestDto,
-  ): Promise<boolean> {
+  ): Promise<unknown> {
     addProductRequestDto.userId = request.user.id;
     return await this.cartService.addProduct(addProductRequestDto);
   }
@@ -28,7 +31,7 @@ export class CartController {
   async updateQuantity(
     @Request() request,
     @Body() updateQuantityRequestDto: UpdateQuantityRequestDto,
-  ): Promise<boolean> {
+  ): Promise<unknown> {
     updateQuantityRequestDto.userId = request.user.id;
     return await this.cartService.updateQuantity(updateQuantityRequestDto);
   }
