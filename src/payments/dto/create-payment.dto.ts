@@ -4,10 +4,26 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsString,
   Validate,
 } from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 
+export class PaymentTierModelDto {
+  @ApiProperty({
+    example: '418f79b5-9c62-45ff-933a-08c0d3e17cb9',
+  })
+  @IsOptional()
+  @IsString()
+  tierModelId: string;
+
+  @ApiProperty({
+    example: '418f79b5-9c62-45ff-933a-08c0d3e17cb9',
+  })
+  @IsOptional()
+  @IsString()
+  modelId: string;
+}
 export class ProductDto {
   @ApiProperty({
     required: true,
@@ -38,6 +54,13 @@ export class ProductDto {
   @IsOptional()
   @IsNumber()
   discount: number;
+
+  @ApiProperty({
+    type: PaymentTierModelDto,
+    isArray: true,
+  })
+  @IsOptional()
+  tierModels: PaymentTierModelDto[];
 }
 
 export class CreatePaymentDto {
@@ -66,10 +89,14 @@ export class CreatePaymentDto {
   note: string;
 
   @ApiProperty({
-    example: '77/7 Tan Lap 2, Hiep Phu, Q9, TP.HCM',
+    example: 1,
   })
-  @IsOptional()
-  address: string;
+  @IsNotEmpty()
+  @IsNumber()
+  @Validate(IsExist, ['Address', 'id'], {
+    message: 'Address not exists',
+  })
+  address: number;
 
   paymentMethod: string;
 

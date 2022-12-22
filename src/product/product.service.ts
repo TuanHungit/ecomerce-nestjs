@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { get, set } from 'lodash';
@@ -24,6 +29,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { ProductResponseDto } from './dto/product-response.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { Product } from './entity/product.entity';
+import { OrderTierModelDto } from 'src/orders/dto/create-order.dto';
 
 @Injectable()
 export class ProductService extends BaseService<Product, Repository<Product>> {
@@ -33,7 +39,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     private modelService: ModelService,
     private tierModelService: TierModelService,
     private fileService: FilesService,
-    private userService: UsersService, // private reviewService: ReviewService,
+    private userService: UsersService,
   ) {
     super(productRepository, 'product');
   }
@@ -112,12 +118,23 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     return super.create(data);
   }
 
-  async getOne(productId: number): Promise<ProductResponseDto> {
+  async getOne(productId: number, userId: number): Promise<ProductResponseDto> {
+    console.log('userId', userId);
     //* get product
     const product = await super.findOne({ id: productId });
-    return plainToClass(ProductResponseDto, product, {
-      excludeExtraneousValues: true,
+
+    const viewCount = Number(product.viewCount) + 1;
+    await this.productRepository.update(productId, {
+      viewCount: viewCount,
     });
+
+    return plainToClass(
+      ProductResponseDto,
+      { ...product, viewCount },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
   filers(searchProductDto: SearchProductDto) {
@@ -259,8 +276,16 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     return true;
   }
 
-  async purchaseProduct(productId: number, quantity: number): Promise<void> {
+  async purchaseProduct(
+    productId: number,
+    quantity: number,
+    tierModels: OrderTierModelDto[],
+  ): Promise<void> {
     try {
+      const product = await super.findOne({ id: productId });
+      if (product.stock - quantity < 0) {
+        throw new BadRequestException('Product sold out');
+      }
       await this.productRepository.update(
         {
           id: productId,
@@ -270,6 +295,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
           stock: () => `stock - ${quantity}`,
         },
       );
+      await this.tierModelService.purchaseProduct(quantity, tierModels);
     } catch (error) {
       console.log(error);
     }
@@ -287,5 +313,46 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
       },
     );
     return affected === 1 ? true : false;
+  }
+
+  async getTopSearch(paginationOptions: IPaginationOptions) {
+    const wheres = {
+      status: 1,
+    };
+    let totalPages = 1;
+    if (paginationOptions.limit) {
+      const totalRows = await this.repository.count({
+        where: wheres,
+      });
+      totalPages = Math.ceil(totalRows / paginationOptions.limit);
+    }
+    return infinityPagination(
+      await this.repository.find({
+        ...(paginationOptions.page &&
+          paginationOptions.limit && {
+            skip: (paginationOptions.page - 1) * paginationOptions.limit,
+          }),
+        ...(paginationOptions.limit && { take: paginationOptions.limit }),
+        where: wheres,
+        select: [
+          'id',
+          'name',
+          'price',
+          'priceBeforeDiscount',
+          'discount',
+          'image',
+          'viewCount',
+          'sold',
+        ],
+        order: {
+          viewCount: 'DESC',
+        },
+        cache: true,
+        loadEagerRelations: false,
+        relations: ['image'],
+      }),
+      totalPages,
+      paginationOptions,
+    );
   }
 }

@@ -4,10 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ORDER_TYPE } from '../orders.constant';
+import { Address } from 'src/address/entity/address.entity';
 
 @Entity('orders')
 export class Orders extends BaseEntity {
@@ -28,7 +30,7 @@ export class Orders extends BaseEntity {
   userId: string;
 
   @ApiProperty()
-  @Column({ type: 'enum', enum: ORDER_TYPE, default: ORDER_TYPE.UNPAID })
+  @Column({ type: 'enum', enum: ORDER_TYPE, default: ORDER_TYPE.DELIVERING })
   status: ORDER_TYPE;
 
   @ApiProperty()
@@ -36,8 +38,10 @@ export class Orders extends BaseEntity {
   note: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  address: string;
+  @ManyToOne(() => Address, {
+    eager: true,
+  })
+  address: Address | number;
 
   @ApiProperty()
   @Column()

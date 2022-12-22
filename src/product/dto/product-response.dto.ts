@@ -108,6 +108,12 @@ export class ProductResponseDto {
   likedCount?: number;
 
   @Expose()
+  viewCount: number;
+
+  @Expose()
+  isCurrentUserLiked: boolean;
+
+  @Expose()
   discount?: number;
 
   @Expose()

@@ -3,11 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import { get } from 'lodash';
-import { CreateOrderDto } from 'src/orders/dto/create-order.dto';
 import { OrdersService } from 'src/orders/orders.service';
 import { sign } from 'src/utils/gen-signature';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
-import { PAYMENT_TYPE } from '../payment.constant';
 
 @Injectable()
 export class MomoService {
@@ -16,18 +14,6 @@ export class MomoService {
     private configService: ConfigService,
   ) {}
   async checkout(data: CreatePaymentDto, callback?: (payUrl: string) => void) {
-    //* prepare pending order data
-    const createOrderDto = new CreateOrderDto();
-    createOrderDto.userId = data.userId;
-    createOrderDto.totalAmount = data.totalAmount;
-    createOrderDto.products = data.products;
-    createOrderDto.note = data.note;
-    createOrderDto.address = data.address;
-    createOrderDto.paymentMethod = PAYMENT_TYPE.MOMO;
-    createOrderDto.createdBy = data.createdBy;
-    //* create pending order
-    const order = await this.orderService.createOrder(createOrderDto);
-
     //* prepare data to call momo api
     const {
       url,
@@ -38,10 +24,9 @@ export class MomoService {
       ipnUrl,
       requestType,
     } = this.getConfig();
-    const { totalAmount, ...rest } = data;
-    const extraData = Buffer.from(
-      JSON.stringify({ ...rest, orderId: order.id }),
-    ).toString('base64');
+    const { totalAmount } = data;
+    console.log('data', data);
+    const extraData = Buffer.from(JSON.stringify({ data })).toString('base64');
     const requestId = partnerCode + new Date().getTime();
     const orderId = requestId;
     const orderInfo = 'Thanh toán online';
@@ -65,6 +50,7 @@ export class MomoService {
         signature,
       })
       .then((response) => {
+        console.log('url', get(response, 'data.payUrl'));
         callback(get(response, 'data.payUrl'));
       })
       .catch((error) => {

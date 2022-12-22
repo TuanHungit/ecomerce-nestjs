@@ -92,6 +92,10 @@ export class Product extends EntityHelper {
   sold?: number | null;
 
   @ApiProperty()
+  @Column({ default: 0 })
+  viewCount?: number | null;
+
+  @ApiProperty()
   @ManyToOne(() => Status, {
     eager: true,
   })
@@ -128,7 +132,7 @@ export class Product extends EntityHelper {
   keywords?: string[] | null;
 
   @ApiProperty()
-  @Column('jsonb', { nullable: true, default: {} })
+  @Column({ nullable: true, default: {}, name: 'params', type: 'jsonb' })
   params?: Record<string, unknown>;
 
   @ApiProperty()

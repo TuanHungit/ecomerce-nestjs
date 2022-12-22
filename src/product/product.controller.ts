@@ -87,6 +87,18 @@ export class ProductController {
     );
   }
 
+  @Get('top-search')
+  @HttpCode(HttpStatus.OK)
+  topSearch(@Query('page') page: number, @Query('limit') limit: number) {
+    if (limit > 50) {
+      limit = 50;
+    }
+    return this.productService.getTopSearch({
+      page,
+      limit,
+    });
+  }
+
   @Get('search-hint')
   @HttpCode(HttpStatus.OK)
   async searchHint(@Query('keyword') keyword: string) {
@@ -95,8 +107,8 @@ export class ProductController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: number) {
-    return this.productService.getOne(id);
+  findOne(@Request() request, @Param('id') id: number) {
+    return this.productService.getOne(id, request?.user?.id);
   }
 
   @Patch(':id')
