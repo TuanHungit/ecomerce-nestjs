@@ -24,7 +24,10 @@ import { Review } from './entity/review.entity';
 import { ReviewService } from './review.service';
 
 @ApiTags('Review')
-@Controller('reviews')
+@Controller({
+  path: 'reviews',
+  version: '1',
+})
 export class ReviewController {
   constructor(private reviewService: ReviewService) {}
 

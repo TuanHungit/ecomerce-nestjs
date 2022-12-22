@@ -15,7 +15,10 @@ import { StripeService } from './stripe/stripe.service';
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Payments')
-@Controller('payments')
+@Controller({
+  path: 'payments',
+  version: '1',
+})
 export class PaymentsController {
   constructor(
     private stripeService: StripeService,
