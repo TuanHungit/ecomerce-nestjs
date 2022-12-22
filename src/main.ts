@@ -14,6 +14,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.enableShutdownHooks();
+  app.enableCors();
   app.setGlobalPrefix(configService.get('app.apiPrefix'), {
     exclude: ['/'],
   });

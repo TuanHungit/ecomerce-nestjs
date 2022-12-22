@@ -14,6 +14,7 @@ export class MomoService {
     private configService: ConfigService,
   ) {}
   async checkout(data: CreatePaymentDto, callback?: (payUrl: string) => void) {
+    console.log(callback);
     //* prepare data to call momo api
     const {
       url,
@@ -51,7 +52,9 @@ export class MomoService {
       })
       .then((response) => {
         console.log('url', get(response, 'data.payUrl'));
-        callback(get(response, 'data.payUrl'));
+        return {
+          link: get(response, 'data.payUrl'),
+        };
       })
       .catch((error) => {
         return { ...get(error, 'response.data') };
