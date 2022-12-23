@@ -173,7 +173,9 @@ export class CartService {
     productId: number,
     tierModel: Record<string, unknown>[],
   ): string {
-    const tierModelIds = tierModel.map((tier) => `${tier.id},${tier.modelId}`);
+    const tierModelIds = tierModel.map(
+      (tier) => `${get(tier, 'id', get(tier, 'tierModelId'))},${tier.modelId}`,
+    );
     return tierModelIds
       .concat([`${productId}`, `${userId}`])
       .sort()
