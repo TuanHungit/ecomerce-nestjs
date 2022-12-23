@@ -52,9 +52,7 @@ export class MomoService {
       })
       .then((response) => {
         console.log('url', get(response, 'data.payUrl'));
-        return {
-          link: get(response, 'data.payUrl'),
-        };
+        return get(response, 'data.payUrl');
       })
       .catch((error) => {
         return { ...get(error, 'response.data') };
