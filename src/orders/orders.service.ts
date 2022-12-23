@@ -83,10 +83,6 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     createOrderDto.createdBy = data.createdBy;
     //* create pending order
     const order = await this.createOrder(createOrderDto);
-    await this.cartService.deleteProduct({
-      userId: data.userId,
-      products: data.products,
-    });
     return callback(+order?.id);
   }
 }
