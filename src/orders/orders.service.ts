@@ -10,6 +10,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderProducts } from './entity/order-products.entity';
 import { Orders } from './entity/orders.entity';
 import { ORDER_TYPE } from './orders.constant';
+import { CartService } from 'src/cart/cart.service';
 
 @Injectable()
 export class OrdersService extends BaseService<Orders, Repository<Orders>> {
@@ -19,6 +20,7 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     @InjectRepository(OrderProducts)
     private orderProductsRepository: Repository<OrderProducts>,
     private productService: ProductService,
+    private cartService: CartService,
   ) {
     super(orderRepository, 'order');
   }
@@ -81,7 +83,10 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     createOrderDto.createdBy = data.createdBy;
     //* create pending order
     const order = await this.createOrder(createOrderDto);
-    console.log('order', order);
+    await this.cartService.deleteProduct({
+      userId: data.userId,
+      products: data.products,
+    });
     return callback(+order?.id);
   }
 }
