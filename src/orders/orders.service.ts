@@ -32,6 +32,7 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
         const productPromise = products.map(async (product) => {
           const params = {
             productName: get(product, 'name'),
+            imagePath: get(product, 'imagePath'),
             tierModels: get(product, 'tierModels'),
           };
 

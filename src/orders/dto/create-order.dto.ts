@@ -61,6 +61,14 @@ export class ProductDto {
   @IsOptional()
   name: string;
 
+  @ApiProperty({
+    required: true,
+    example:
+      'localhost:3000/api/v1/files/23ac18ad-57d8-4960-a021-c2d80fc256f5.jpeg',
+  })
+  @IsNotEmpty()
+  imagePath: string;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
