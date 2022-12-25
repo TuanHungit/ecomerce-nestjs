@@ -2,9 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TierModel } from 'src/tier-model/entities/tier-model.entity';
 import { BaseService } from 'src/shared/services/base.service';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { OrderTierModelDto } from 'src/orders/dto/create-order.dto';
 import { Model } from 'src/model/entities/model.entity';
+import { ModelService } from 'src/model/model.service';
 
 @Injectable()
 export class TierModelService extends BaseService<
@@ -16,19 +17,17 @@ export class TierModelService extends BaseService<
     private repositoryTierModel: Repository<TierModel>,
     @InjectRepository(Model)
     private repositoryModel: Repository<Model>,
+    private readonly modelService: ModelService,
   ) {
     super(repositoryTierModel, 'tier-model');
   }
 
   async purchaseProduct(quantity: number, tierModels: OrderTierModelDto[]) {
-    console.log(' tierModels', tierModels);
     try {
       if (tierModels.length < 2) {
         const tierModel = tierModels[0];
-        const model = await this.repositoryModel.findOne({
-          where: {
-            id: tierModel.modelId,
-          },
+        const model = await this.modelService.findOne({
+          id: tierModel.modelId,
         });
         if (model.stock - quantity < 0) {
           throw new BadRequestException('Product sold out');
@@ -40,13 +39,11 @@ export class TierModelService extends BaseService<
       } else if (tierModels.length === 2) {
         const parentTierModel = tierModels[0];
         const tierModel = tierModels[1];
-        const where = {
+        const where: FindOptionsWhere<Model> = {
           id: tierModel.modelId,
           parent: parentTierModel.tierModelId,
         };
-        const model = await this.repositoryModel.findOne({
-          where,
-        });
+        const model = await this.modelService.findOne(where);
         if (model.stock - quantity < 0) {
           throw new BadRequestException('Product sold out');
         }
@@ -56,7 +53,7 @@ export class TierModelService extends BaseService<
         });
       }
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 }

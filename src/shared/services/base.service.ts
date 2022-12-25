@@ -81,10 +81,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
     );
   }
 
-  async findOne(
-    fields: EntityCondition<T> | EntityCondition<T>[],
-    relations?: string[],
-  ): Promise<T> {
+  async findOne(fields: EntityCondition<T>, relations?: string[]): Promise<T> {
     // const isSlug = isNaN(+get(fields, 'id'));
     // const where = !isSlug
     //   ? ({
@@ -136,10 +133,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>>
       await this.repository.save(
         this.repository.create({ id, ...data }) as any,
       );
-      return this.findOne(
-        [{ id }] as unknown as EntityCondition<T>[],
-        relations,
-      );
+      return this.findOne({ id } as unknown as EntityCondition<T>, relations);
     } catch (err) {
       console.log(err);
       throw new HttpException(

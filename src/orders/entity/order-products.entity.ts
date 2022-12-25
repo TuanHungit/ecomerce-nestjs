@@ -48,4 +48,10 @@ export class OrderProducts extends BaseEntity {
   @ApiProperty()
   @Column({ nullable: true })
   discount: number;
+
+  @Column({
+    nullable: true,
+    type: 'jsonb',
+  })
+  params: Record<string, unknown>;
 }

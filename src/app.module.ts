@@ -37,6 +37,7 @@ import { MomoModule } from './payments/momo/momo.module';
 import momoConfig from './config/momo.config';
 import { CartModule } from './cart/cart.module';
 import { AddressModule } from './address/address.module';
+import { CashModule } from './payments/cash/cash.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { AddressModule } from './address/address.module';
     StripeModule,
     MomoModule,
     OrdersModule,
+    CashModule,
     ReviewModule,
     CartModule,
     AddressModule,

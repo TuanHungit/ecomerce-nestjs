@@ -7,6 +7,7 @@ import {
   IsString,
   Validate,
 } from 'class-validator';
+import { ORDER_TYPE } from 'src/orders/orders.constant';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 
 export class PaymentTierModelDto {
@@ -18,11 +19,25 @@ export class PaymentTierModelDto {
   tierModelId: string;
 
   @ApiProperty({
+    required: true,
+    example: 'Màu sắc',
+  })
+  @IsNotEmpty()
+  tierModelName: string;
+
+  @ApiProperty({
     example: '418f79b5-9c62-45ff-933a-08c0d3e17cb9',
   })
   @IsOptional()
   @IsString()
   modelId: string;
+
+  @ApiProperty({
+    required: true,
+    example: 'Pink',
+  })
+  @IsOptional()
+  modelName: string;
 }
 export class ProductDto {
   @ApiProperty({
@@ -34,6 +49,13 @@ export class ProductDto {
     message: 'Product not exists',
   })
   productId: number;
+
+  @ApiProperty({
+    required: true,
+    example: 'Apple iPhone 13 128GB',
+  })
+  @IsOptional()
+  name: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -83,12 +105,6 @@ export class CreatePaymentDto {
   products: ProductDto[];
 
   @ApiProperty({
-    example: 'This is note',
-  })
-  @IsOptional()
-  note: string;
-
-  @ApiProperty({
     example: 1,
   })
   @IsNotEmpty()
@@ -97,6 +113,8 @@ export class CreatePaymentDto {
     message: 'Address not exists',
   })
   address: number;
+
+  status: ORDER_TYPE;
 
   paymentMethod: string;
 

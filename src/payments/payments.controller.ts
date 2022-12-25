@@ -11,6 +11,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { MomoService } from './momo/momo.service';
 import { StripeService } from './stripe/stripe.service';
+import { CashService } from './cash/cash.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -23,6 +24,7 @@ export class PaymentsController {
   constructor(
     private stripeService: StripeService,
     private momoService: MomoService,
+    private cashService: CashService,
   ) {}
 
   @Post('stripe')
@@ -30,7 +32,7 @@ export class PaymentsController {
     try {
       return this.stripeService.checkout();
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -49,9 +51,19 @@ export class PaymentsController {
           return res.redirect(payUrl);
         },
       );
-      return await '';
     } catch (error) {
       return error;
     }
+  }
+
+  @Post('cash')
+  async checkoutCash(
+    @Request() request,
+    @Res({ passthrough: true }) res,
+    @Body() createPaymentDto: CreatePaymentDto,
+  ) {
+    createPaymentDto.userId = request.user.id;
+    createPaymentDto.createdBy = request.user.email;
+    return await this.cashService.checkout(createPaymentDto);
   }
 }

@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isEmpty, set } from 'lodash';
+import { get, isEmpty, set } from 'lodash';
 import { PAYMENT_TYPE } from 'src/payments/payment.constant';
 import { ProductService } from 'src/product/product.service';
 import { BaseService } from 'src/shared/services/base.service';
+import { infinityPagination } from 'src/utils/infinity-pagination';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderProducts } from './entity/order-products.entity';
 import { Orders } from './entity/orders.entity';
 import { ORDER_TYPE } from './orders.constant';
-import { CartService } from 'src/cart/cart.service';
 
 @Injectable()
 export class OrdersService extends BaseService<Orders, Repository<Orders>> {
@@ -20,7 +20,6 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     @InjectRepository(OrderProducts)
     private orderProductsRepository: Repository<OrderProducts>,
     private productService: ProductService,
-    private cartService: CartService,
   ) {
     super(orderRepository, 'order');
   }
@@ -30,8 +29,14 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     const order = await super.create(data);
     try {
       if (!isEmpty(products)) {
-        const productPromise = products.map((product) => {
+        const productPromise = products.map(async (product) => {
+          const params = {
+            productName: get(product, 'name'),
+            tierModels: get(product, 'tierModels'),
+          };
+
           set(product, 'orderId', order.id);
+          set(product, 'params', params);
           return Promise.all([
             this.productService.purchaseProduct(
               +product.productId,
@@ -43,10 +48,11 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
             ),
           ]);
         });
-        await Promise.all([productPromise]);
+        await Promise.all(productPromise);
       }
     } catch (error) {
-      console.log(error);
+      console.log('errrror', error);
+      throw error;
     }
 
     return order;
@@ -54,9 +60,38 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
 
   async getOrdersByMe(
     paginationOptions: IPaginationOptions,
-    wheres: FindOptionsWhere<Orders>,
+    wheres: FindOptionsWhere<unknown>,
   ) {
-    return super.findManyWithPagination(paginationOptions, null, wheres);
+    let totalPages = 1;
+    if (paginationOptions.limit) {
+      const totalRows = await this.repository.count({
+        where: wheres,
+      });
+      totalPages = Math.ceil(totalRows / paginationOptions.limit);
+    }
+    let orders = await this.repository.find({
+      ...(paginationOptions.page &&
+        paginationOptions.limit && {
+          skip: (paginationOptions.page - 1) * paginationOptions.limit,
+        }),
+      ...(paginationOptions.limit && { take: paginationOptions.limit }),
+      where: wheres,
+      order: {
+        createdAt: 'DESC',
+      },
+      cache: true,
+    });
+    const orderPromises = orders?.map(async (order) => {
+      const products = await this.orderProductsRepository.find({
+        where: {
+          orderId: order.id,
+        },
+      });
+      set(order, 'products', products);
+      return order;
+    });
+    orders = await Promise.all(orderPromises);
+    return infinityPagination(orders, totalPages, paginationOptions);
   }
 
   async handleMomoRedirect(
@@ -76,7 +111,6 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     createOrderDto.userId = data.userId;
     createOrderDto.totalAmount = data.totalAmount;
     createOrderDto.products = data.products;
-    createOrderDto.note = data.note;
     createOrderDto.address = data.address;
     createOrderDto.status = ORDER_TYPE.DELIVERING;
     createOrderDto.paymentMethod = PAYMENT_TYPE.MOMO;
@@ -84,5 +118,16 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     //* create pending order
     const order = await this.createOrder(createOrderDto);
     return callback(+order?.id);
+  }
+
+  async getOne(id: number): Promise<unknown> {
+    const order = await super.findOne({ id }, ['address']);
+    const products = await this.orderProductsRepository.find({
+      where: {
+        orderId: order.id,
+      },
+    });
+    set(order, 'products', products);
+    return order;
   }
 }

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { OrdersModule } from 'src/orders/orders.module';
+import { CashService } from './cash.service';
 import { PaymentsController } from '../payments.controller';
 import { StripeService } from '../stripe/stripe.service';
-import { MomoService } from './momo.service';
-import { CashService } from '../cash/cash.service';
+import { MomoService } from '../momo/momo.service';
 
 @Module({
-  imports: [OrdersModule],
-  providers: [MomoService, StripeService, CashService],
-  exports: [MomoService],
   controllers: [PaymentsController],
+  imports: [OrdersModule],
+  providers: [CashService, StripeService, MomoService],
+  exports: [CashService],
 })
-export class MomoModule {}
+export class CashModule {}

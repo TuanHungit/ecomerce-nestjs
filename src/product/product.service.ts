@@ -296,9 +296,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         },
       );
       await this.tierModelService.purchaseProduct(quantity, tierModels);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   async changeStatus(id: number): Promise<boolean> {

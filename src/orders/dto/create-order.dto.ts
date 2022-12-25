@@ -20,11 +20,25 @@ export class OrderTierModelDto {
   tierModelId: string;
 
   @ApiProperty({
+    required: true,
+    example: 'Màu sắc',
+  })
+  @IsNotEmpty()
+  tierModelName: string;
+
+  @ApiProperty({
     example: '418f79b5-9c62-45ff-933a-08c0d3e17cb9',
   })
   @IsOptional()
   @IsString()
   modelId: string;
+
+  @ApiProperty({
+    required: true,
+    example: 'Pink',
+  })
+  @IsOptional()
+  modelName: string;
 }
 
 export class ProductDto {
@@ -39,6 +53,13 @@ export class ProductDto {
   @IsNotEmpty()
   @IsNumber()
   quantity: number;
+
+  @ApiProperty({
+    required: true,
+    example: 'Apple iPhone 13 128GB',
+  })
+  @IsOptional()
+  name: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -71,10 +92,6 @@ export class CreateOrderDto {
   products: ProductDto[] | OrderProducts[];
 
   userId: string;
-
-  @ApiProperty()
-  @IsOptional()
-  note: string;
 
   @ApiProperty()
   @IsOptional()

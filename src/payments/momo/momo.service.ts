@@ -26,7 +26,6 @@ export class MomoService {
       requestType,
     } = this.getConfig();
     const { totalAmount } = data;
-    console.log('data', data);
     const extraData = Buffer.from(JSON.stringify({ data })).toString('base64');
     const requestId = partnerCode + new Date().getTime();
     const orderId = requestId;

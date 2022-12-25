@@ -1,6 +1,8 @@
 import {
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Response,
@@ -52,6 +54,7 @@ export class FilesController {
       fileFilter: pngFileFilter,
     }),
   )
+  @HttpCode(HttpStatus.OK)
   async uploadMultipleFile(@UploadedFiles() files: Array<Express.Multer.File>) {
     return this.filesService.uploadFiles(files);
   }

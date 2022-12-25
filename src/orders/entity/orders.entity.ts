@@ -34,12 +34,8 @@ export class Orders extends BaseEntity {
   status: ORDER_TYPE;
 
   @ApiProperty()
-  @Column()
-  note: string;
-
-  @ApiProperty()
   @ManyToOne(() => Address, {
-    eager: true,
+    eager: false,
   })
   address: Address | number;
 
