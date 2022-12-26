@@ -14,7 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { pick } from 'lodash';
 import { EntityCondition } from 'src/utils/types/entity-condition.type';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -33,12 +33,16 @@ export class ReviewController {
 
   @Post()
   @ApiBearerAuth()
+  @ApiBody({
+    type: CreateReviewDto,
+    isArray: true,
+  })
   @UseGuards(AuthGuard('jwt'))
-  create(@Request() request, @Body() createReviewDto: CreateReviewDto) {
-    createReviewDto.user = {
+  create(@Request() request, @Body() createReviewDtos: CreateReviewDto[]) {
+    const user = {
       ...pick(request.user, ['id', 'email', 'fullName', 'photo']),
     };
-    return this.reviewService.create(createReviewDto);
+    return this.reviewService.createMultipleReviews(user, createReviewDtos);
   }
 
   @Post('searching')
@@ -47,8 +51,6 @@ export class ReviewController {
     @Body() filters: SearchingReviewDto,
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
-    @Query('column', new DefaultValuePipe('id')) column?: string,
   ) {
     if (limit > 50) {
       limit = 50;
@@ -60,7 +62,6 @@ export class ReviewController {
         limit,
       },
       { ...filters } as EntityCondition<Review>,
-      { sort: column, order: sort },
     );
   }
 

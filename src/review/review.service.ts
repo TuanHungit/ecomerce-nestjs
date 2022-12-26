@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { InjectRepository } from '@nestjs/typeorm';
-import { omit, pick } from 'lodash';
+import { omit, pick, set } from 'lodash';
 import { FilesService } from 'src/files/files.service';
 import { ProductService } from 'src/product/product.service';
 import { BaseService } from 'src/shared/services/base.service';
@@ -21,53 +21,69 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
     super(reviewRepository, 'review');
   }
 
-  async create(data: CreateReviewDto) {
-    const product = await this.productService.findOne({
-      id: data.productId,
-    });
-    data.product = {
-      ...pick(product, ['id', 'name']),
-    };
+  async createMultipleReviews(
+    user: Record<string, unknown>,
+    dtos: CreateReviewDto[],
+  ) {
+    try {
+      const promises = dtos?.map(async (data) => {
+        const product = await this.productService.findOne({
+          id: data.productId,
+        });
+        data.product = {
+          ...pick(product, ['id', 'name']),
+        };
+        set(data, 'user', user);
 
-    // find images
-    await Promise.all(
-      data.files?.map((id) => {
-        return this.fileService.findOne({ id });
-      }),
-    ).then((res) => {
-      data.files = res;
-    });
-    data.status = {
-      id: StatusEnum.active,
-      name: 'Active',
-    };
-    const dataToSave = omit(data, ['productId', 'userId']);
-    const result = await super.create(dataToSave);
+        console.log('data', data);
+        // find images
+        await Promise.all(
+          data.files?.map((id) => {
+            return this.fileService.findOne({ id });
+          }),
+        )
+          .then((res) => {
+            data.files = res;
+          })
+          .catch((error) => {
+            throw error;
+          });
+        data.status = {
+          id: StatusEnum.active,
+          name: 'Active',
+        };
+        const dataToSave = omit(data, ['productId', 'userId']);
+        const result = await super.create(dataToSave);
 
-    // statistics by rating
-    const reviews = await this.statisticsByRatingAndProduct(product.id);
-    const ratingTotal = reviews?.reduce((prev, cur) => {
-      return prev + cur.rating * +cur.total;
-    }, 0);
-    const reviewTotal = reviews?.reduce((prev, cur) => {
-      return prev + +cur.total;
-    }, 0);
-    await this.productService.update(product.id, {
-      ...data,
-      params: {
-        ...product.params,
-        reviewTotal,
-        ratingAvg: Math.round((ratingTotal / reviewTotal) * 10) / 10,
-        statisticReview: reviews,
-      },
-    });
-    return result;
+        // statistics by rating
+        const reviews = await this.statisticsByRatingAndProduct(product.id);
+        const ratingTotal = reviews?.reduce((prev, cur) => {
+          return prev + cur.rating * +cur.total;
+        }, 0);
+        const reviewTotal = reviews?.reduce((prev, cur) => {
+          return prev + +cur.total;
+        }, 0);
+        await this.productService.update(product.id, {
+          ...data,
+          params: {
+            ...product.params,
+            reviewTotal,
+            ratingAvg: Math.round((ratingTotal / reviewTotal) * 10) / 10,
+            statisticReview: reviews,
+          },
+        });
+        return result;
+      });
+
+      return await Promise.all(promises);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async search(
     paginationOptions: IPaginationOptions,
     wheres?: any,
-    order?: any,
   ): Promise<any> {
     wheres.status = 1;
     const queryBuilder = this.repository
@@ -75,7 +91,7 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
       .where({ ...omit(wheres, 'productId') })
       .skip((paginationOptions.page - 1) * paginationOptions.limit)
       .take(paginationOptions.limit)
-      .orderBy(order.sort, 'ASC');
+      .orderBy('id', 'DESC');
     if (wheres.productId) {
       queryBuilder.andWhere(`review.product ->> 'id' =:productId`, {
         productId: wheres.productId,

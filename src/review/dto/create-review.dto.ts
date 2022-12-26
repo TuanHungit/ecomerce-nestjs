@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsArray,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -31,35 +32,25 @@ export class CreateReviewDto {
   rating: number;
 
   @ApiProperty({
-    example: 'Nice',
-  })
-  @IsOptional()
-  productQuality?: string;
-
-  @ApiProperty({
-    example: 'Yes',
-  })
-  @IsOptional()
-  trueToDescription?: string;
-
-  @ApiProperty({
     example: 'This is a review',
   })
   @IsOptional()
   review: string;
 
   @ApiProperty({
-    example: '1650196b-79cd-4f1c-b61b-c09558262883',
+    example: ['1650196b-79cd-4f1c-b61b-c09558262883'],
     type: isUUID,
     isArray: true,
   })
   @IsOptional()
+  @Validate(IsExist, ['File', 'id'], {
+    message: 'File not exists',
+  })
   @IsUUID(4, { each: true })
+  @IsArray()
   files: FileEntity[] | string[];
 
   status: Status;
 
   product: Record<string, unknown>;
-
-  user: Record<string, unknown>;
 }

@@ -52,7 +52,6 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
         await Promise.all(productPromise);
       }
     } catch (error) {
-      console.log('errrror', error);
       throw error;
     }
 
