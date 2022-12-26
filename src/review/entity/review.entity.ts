@@ -5,11 +5,14 @@ import { Status } from 'src/statuses/entities/status.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('reviews')
@@ -54,4 +57,16 @@ export class Review extends EntityHelper {
     eager: true,
   })
   status: Status;
+
+  @ApiProperty()
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @ApiProperty()
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ApiProperty()
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

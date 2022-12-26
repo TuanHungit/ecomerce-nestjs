@@ -91,7 +91,7 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
       .where({ ...omit(wheres, 'productId') })
       .skip((paginationOptions.page - 1) * paginationOptions.limit)
       .take(paginationOptions.limit)
-      .orderBy('id', 'DESC');
+      .orderBy('review.createdAt', 'DESC');
     if (wheres.productId) {
       queryBuilder.andWhere(`review.product ->> 'id' =:productId`, {
         productId: wheres.productId,
