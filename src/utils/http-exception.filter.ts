@@ -35,6 +35,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message: get(Object.values(errors), '[0]'),
       };
     }
+    console.log('httpStatus', httpStatus);
     delete errors.statusCode;
     delete errors.status;
     const responseBody = {

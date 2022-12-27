@@ -52,7 +52,7 @@ export class PaymentsController {
         },
       );
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 

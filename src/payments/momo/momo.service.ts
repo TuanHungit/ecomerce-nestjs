@@ -1,4 +1,4 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Buffer } from 'buffer';
@@ -54,7 +54,7 @@ export class MomoService {
         return get(response, 'data.payUrl');
       })
       .catch((error) => {
-        throw new BadGatewayException({ ...get(error, 'response.data') });
+        throw new BadRequestException({ ...get(error, 'response.data') });
       });
   }
 
