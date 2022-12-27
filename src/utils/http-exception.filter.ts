@@ -17,7 +17,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // constructor method, thus we should resolve it here.
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
-    let errors = get(exception, 'response.errors', get(exception, 'response'));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let errors: any =
+      get(exception, 'response.errors', get(exception, 'response')) || {};
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()

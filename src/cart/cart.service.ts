@@ -24,8 +24,8 @@ export class CartService {
     });
     const promises = cart?.map(async (el) => {
       const tierModels = castArray(get(el, 'product.tierModel'));
-      const newTierModels = tierModels.map(async (tier) => {
-        console.log('tier', tier);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newTierModels = tierModels.map(async (tier: any) => {
         const tierModel = await this.tierModelService.findOne({
           id: tier.id,
         });
@@ -59,7 +59,7 @@ export class CartService {
         userId,
         productId: product.id,
         tierModels: tierModelIds,
-        quantity: product.quantity + get(existedCart, 'product.quantity'),
+        quantity: +product.quantity + +get(existedCart, 'product.quantity'),
       });
     }
     const dataToSave = {
