@@ -90,7 +90,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
 
       try {
         tierModelEntity.models = await Promise.all(modelPromises);
-        // console.log('tierModelEntity.models', tierModelEntity.models);
       } catch (err) {
         throw new HttpException(
           {

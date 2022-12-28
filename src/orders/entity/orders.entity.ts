@@ -40,6 +40,10 @@ export class Orders extends BaseEntity {
   address: Address | number;
 
   @ApiProperty()
+  @Column({ type: 'jsonb', nullable: true })
+  params: Record<string, unknown>;
+
+  @ApiProperty()
   @Column()
   paymentMethod: string;
 

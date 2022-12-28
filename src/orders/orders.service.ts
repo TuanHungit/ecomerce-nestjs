@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { get, isEmpty, set } from 'lodash';
+import { get, isEmpty, isNil, set } from 'lodash';
 import { PAYMENT_TYPE } from 'src/payments/payment.constant';
 import { ProductService } from 'src/product/product.service';
+import { CartService } from 'src/cart/cart.service';
 import { BaseService } from 'src/shared/services/base.service';
 import { infinityPagination } from 'src/utils/infinity-pagination';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { ChangeOrderStatusDto } from './dto/change-order-status.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderProducts } from './entity/order-products.entity';
 import { Orders } from './entity/orders.entity';
@@ -20,6 +22,7 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     @InjectRepository(OrderProducts)
     private orderProductsRepository: Repository<OrderProducts>,
     private productService: ProductService,
+    private readonly cartService: CartService,
   ) {
     super(orderRepository, 'order');
   }
@@ -117,6 +120,10 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     createOrderDto.createdBy = data.createdBy;
     //* create pending order
     const order = await this.createOrder(createOrderDto);
+    await this.cartService.deleteProduct({
+      userId: data.userId,
+      products: data.products,
+    });
     return callback(+order?.id);
   }
 
@@ -129,5 +136,51 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
     });
     set(order, 'products', products);
     return order;
+  }
+
+  async changeStatus(
+    changeOrderStatusDto: ChangeOrderStatusDto,
+  ): Promise<Orders> {
+    const { orderId, status, note } = changeOrderStatusDto;
+    if (status === ORDER_TYPE.CANCEL && isNil(note)) {
+      throw new BadRequestException('Cancel order must have reason');
+    }
+
+    const order = await super.findOne({ id: orderId });
+    const dataToUpdate: Record<string, unknown> = {
+      [ORDER_TYPE.CANCEL]: {
+        status,
+        params: {
+          ...order.params,
+          isCancel: true,
+          isCancelByAdmin: true,
+          note,
+        },
+      },
+      [ORDER_TYPE.DELIVERING]: {
+        status,
+        params: {
+          ...order.params,
+          note,
+        },
+      },
+      [ORDER_TYPE.CANCEL]: {
+        params: {
+          ...order.params,
+          isCancel: true,
+          isCancelByAdmin: true,
+          note,
+        },
+      },
+      [ORDER_TYPE.SUCCESSFUL]: {
+        status,
+        params: {
+          ...order.params,
+          note,
+        },
+      },
+    };
+
+    return await super.update(orderId, dataToUpdate[status as string]);
   }
 }

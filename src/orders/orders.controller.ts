@@ -16,6 +16,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
+import { ChangeOrderStatusDto } from './dto/change-order-status.dto';
 
 @ApiTags('Orders')
 @Controller({
@@ -52,6 +53,14 @@ export class OrdersController {
         userId: request.user.id,
       },
     );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/change-status')
+  changeStatus(@Request() request, changeOrderStatusDto: ChangeOrderStatusDto) {
+    changeOrderStatusDto.user = request.user;
+    return this.orderService.changeStatus(changeOrderStatusDto);
   }
 
   @ApiBearerAuth()
