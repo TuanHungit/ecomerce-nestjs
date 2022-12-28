@@ -30,7 +30,6 @@ export class IsExistDefault implements ValidatorConstraintInterface {
           },
           loadEagerRelations: false,
         });
-      console.log('entity', entity);
       return Boolean(entity);
     } catch (err) {
       console.log(err);

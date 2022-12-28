@@ -21,6 +21,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductService } from './product.service';
+import { GetTopSoldDto } from './dto/get-top-sold.dto';
 
 @ApiTags('Products')
 @Controller({ path: 'products', version: '1' })
@@ -96,6 +97,37 @@ export class ProductController {
       page,
       limit,
     });
+  }
+
+  @Get('hint-today')
+  @HttpCode(HttpStatus.OK)
+  hintToday(@Query('page') page: number, @Query('limit') limit: number) {
+    if (limit > 50) {
+      limit = 50;
+    }
+    return this.productService.getHintToday({
+      page,
+      limit,
+    });
+  }
+
+  @Post('top-sold')
+  @HttpCode(HttpStatus.OK)
+  topSold(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Body() getTopSoldDto: GetTopSoldDto,
+  ) {
+    if (limit > 50) {
+      limit = 50;
+    }
+    return this.productService.getTopSold(
+      {
+        page,
+        limit,
+      },
+      getTopSoldDto,
+    );
   }
 
   @Get('search-hint')

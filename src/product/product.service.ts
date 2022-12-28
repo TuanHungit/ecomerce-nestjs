@@ -30,12 +30,16 @@ import { ProductResponseDto } from './dto/product-response.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { Product } from './entity/product.entity';
 import { OrderTierModelDto } from 'src/orders/dto/create-order.dto';
+import { OrderProducts } from 'src/orders/entity/order-products.entity';
+import { GetTopSoldDto } from './dto/get-top-sold.dto';
 
 @Injectable()
 export class ProductService extends BaseService<Product, Repository<Product>> {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(OrderProducts)
+    private orderProduct: Repository<OrderProducts>,
     private modelService: ModelService,
     private tierModelService: TierModelService,
     private fileService: FilesService,
@@ -134,10 +138,6 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         excludeExtraneousValues: true,
       },
     );
-  }
-
-  filers(searchProductDto: SearchProductDto) {
-    return searchProductDto;
   }
 
   async searchHint(keyword: string): Promise<string[]> {
@@ -347,6 +347,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
           'image',
           'viewCount',
           'sold',
+          'params',
         ],
         order: {
           viewCount: 'DESC',
@@ -361,9 +362,75 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
   }
 
   async getHintToday(paginationOptions: IPaginationOptions) {
-    const wheres = {
+    const wheres: Record<string, unknown> = {
       status: {
         id: 1,
+      },
+    };
+    const recentlyOrderedProduct = await this.orderProduct.find({
+      order: {
+        id: 'DESC',
+      },
+      take: 1,
+    });
+
+    try {
+      const product = await super.findOne({
+        id: get(recentlyOrderedProduct, '[0].productId'),
+      });
+      const keywords = product.keywords;
+      const keyword = keywords[Math.floor(Math.random() * keywords.length)];
+      wheres.name = ILike(`%${keyword}%`);
+    } catch (error) {}
+    let totalPages = 1;
+    if (paginationOptions.limit) {
+      const totalRows = await this.repository.count({
+        where: wheres,
+      });
+      totalPages = Math.ceil(totalRows / paginationOptions.limit);
+    }
+    return infinityPagination(
+      await this.repository.find({
+        ...(paginationOptions.page &&
+          paginationOptions.limit && {
+            skip: (paginationOptions.page - 1) * paginationOptions.limit,
+          }),
+        ...(paginationOptions.limit && { take: paginationOptions.limit }),
+        where: wheres,
+        select: [
+          'id',
+          'name',
+          'price',
+          'priceBeforeDiscount',
+          'discount',
+          'image',
+          'viewCount',
+          'sold',
+          'params',
+        ],
+        order: {
+          viewCount: 'DESC',
+        },
+        cache: true,
+        loadEagerRelations: false,
+        relations: ['image'],
+      }),
+      totalPages,
+      paginationOptions,
+    );
+  }
+
+  async getTopSold(
+    paginationOptions: IPaginationOptions,
+    getTopSoldDto: GetTopSoldDto,
+  ) {
+    const { categoriesId } = getTopSoldDto;
+    const wheres: Record<string, unknown> = {
+      status: {
+        id: 1,
+      },
+      categories: {
+        id: categoriesId,
       },
     };
     let totalPages = 1;
@@ -390,9 +457,10 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
           'image',
           'viewCount',
           'sold',
+          'params',
         ],
         order: {
-          viewCount: 'DESC',
+          sold: 'DESC',
         },
         cache: true,
         loadEagerRelations: false,

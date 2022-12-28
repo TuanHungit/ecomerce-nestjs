@@ -34,7 +34,6 @@ export class AuthService {
     const user = await this.usersService.findOne({
       email: loginDto.email,
     });
-    console.log('user', user, user.role.id);
     if (
       !user ||
       (user &&
@@ -46,7 +45,7 @@ export class AuthService {
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            email: 'Not Found',
+            email: 'Email not found',
           },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -85,7 +84,7 @@ export class AuthService {
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            password: 'incorrectPassword',
+            password: 'Incorrect password',
           },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
