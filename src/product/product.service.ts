@@ -168,6 +168,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     wheres?: FindOptionsWhere<Product>,
     orders?: FindOptionsOrder<Product>,
     likes?: string[],
+    isAdmin?: boolean,
   ) {
     const selects = [];
     if (fields) {
@@ -200,7 +201,11 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
     if (searchProductDto.keyword) {
       wheres.name = ILike(`%${searchProductDto.keyword}%`);
     }
-    wheres.status = 1;
+    if (!isAdmin) {
+      wheres.status = {
+        id: 1,
+      };
+    }
     let totalPages = 1;
     if (paginationOptions.limit) {
       const totalRows = await this.repository.count({
@@ -220,7 +225,7 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
         order: orders,
         cache: true,
         loadEagerRelations: false,
-        relations: ['image'],
+        relations: ['image', 'status'],
       }),
       totalPages,
       paginationOptions,
@@ -314,7 +319,52 @@ export class ProductService extends BaseService<Product, Repository<Product>> {
 
   async getTopSearch(paginationOptions: IPaginationOptions) {
     const wheres = {
-      status: 1,
+      status: {
+        id: 1,
+      },
+    };
+    let totalPages = 1;
+    if (paginationOptions.limit) {
+      const totalRows = await this.repository.count({
+        where: wheres,
+      });
+      totalPages = Math.ceil(totalRows / paginationOptions.limit);
+    }
+    return infinityPagination(
+      await this.repository.find({
+        ...(paginationOptions.page &&
+          paginationOptions.limit && {
+            skip: (paginationOptions.page - 1) * paginationOptions.limit,
+          }),
+        ...(paginationOptions.limit && { take: paginationOptions.limit }),
+        where: wheres,
+        select: [
+          'id',
+          'name',
+          'price',
+          'priceBeforeDiscount',
+          'discount',
+          'image',
+          'viewCount',
+          'sold',
+        ],
+        order: {
+          viewCount: 'DESC',
+        },
+        cache: true,
+        loadEagerRelations: false,
+        relations: ['image'],
+      }),
+      totalPages,
+      paginationOptions,
+    );
+  }
+
+  async getHintToday(paginationOptions: IPaginationOptions) {
+    const wheres = {
+      status: {
+        id: 1,
+      },
     };
     let totalPages = 1;
     if (paginationOptions.limit) {

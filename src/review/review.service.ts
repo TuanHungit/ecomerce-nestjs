@@ -35,7 +35,6 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
         };
         set(data, 'user', user);
 
-        console.log('data', data);
         // find images
         await Promise.all(
           data.files?.map((id) => {
@@ -49,8 +48,8 @@ export class ReviewService extends BaseService<Review, Repository<Review>> {
             throw error;
           });
         data.status = {
-          id: StatusEnum.active,
-          name: 'Active',
+          id: StatusEnum.inactive,
+          name: 'Inactive',
         };
         const dataToSave = omit(data, ['productId', 'userId']);
         const result = await super.create(dataToSave);

@@ -13,6 +13,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderProducts } from './entity/order-products.entity';
 import { Orders } from './entity/orders.entity';
 import { ORDER_TYPE } from './orders.constant';
+import { RoleEnum } from 'src/roles/roles.enum';
 
 @Injectable()
 export class OrdersService extends BaseService<Orders, Repository<Orders>> {
@@ -141,11 +142,12 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
   async changeStatus(
     changeOrderStatusDto: ChangeOrderStatusDto,
   ): Promise<Orders> {
-    const { orderId, status, note } = changeOrderStatusDto;
+    const { orderId, status, note, user } = changeOrderStatusDto;
     if (status === ORDER_TYPE.CANCEL && isNil(note)) {
       throw new BadRequestException('Cancel order must have reason');
     }
 
+    const isAdmin = get(user, 'role.id', RoleEnum.user) === RoleEnum.admin;
     const order = await super.findOne({ id: orderId });
     const dataToUpdate: Record<string, unknown> = {
       [ORDER_TYPE.CANCEL]: {
@@ -153,7 +155,7 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
         params: {
           ...order.params,
           isCancel: true,
-          isCancelByAdmin: true,
+          isCancelByAdmin: isAdmin,
           note,
         },
       },
@@ -161,14 +163,6 @@ export class OrdersService extends BaseService<Orders, Repository<Orders>> {
         status,
         params: {
           ...order.params,
-          note,
-        },
-      },
-      [ORDER_TYPE.CANCEL]: {
-        params: {
-          ...order.params,
-          isCancel: true,
-          isCancelByAdmin: true,
           note,
         },
       },

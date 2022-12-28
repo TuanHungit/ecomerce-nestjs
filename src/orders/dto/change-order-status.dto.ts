@@ -9,7 +9,7 @@ export class ChangeOrderStatusDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  @Validate(IsExist, ['Order', 'id'], {
+  @Validate(IsExist, ['Orders', 'id'], {
     message: 'Order not exists',
   })
   orderId: number;

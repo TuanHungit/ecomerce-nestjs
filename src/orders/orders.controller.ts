@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Delete,
@@ -58,7 +59,10 @@ export class OrdersController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post('/change-status')
-  changeStatus(@Request() request, changeOrderStatusDto: ChangeOrderStatusDto) {
+  changeStatus(
+    @Request() request,
+    @Body() changeOrderStatusDto: ChangeOrderStatusDto,
+  ) {
     changeOrderStatusDto.user = request.user;
     return this.orderService.changeStatus(changeOrderStatusDto);
   }

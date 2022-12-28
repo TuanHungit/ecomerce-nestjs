@@ -8,21 +8,18 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
-  Request,
   Patch,
   Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { get } from 'lodash';
-import { EntityCondition } from 'src/utils/types/entity-condition.type';
 import { CreateProductDto } from './dto/create-product.dto';
-import { FilterProductDto } from './dto/filter-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Product } from './entity/product.entity';
 import { ProductService } from './product.service';
 
 @ApiTags('Products')
@@ -38,7 +35,7 @@ export class ProductController {
   @Post('paging')
   @HttpCode(HttpStatus.OK)
   paging(
-    @Body() filters: FilterProductDto,
+    @Body() searchProductDto: SearchProductDto,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('sort', new DefaultValuePipe(1), ParseIntPipe) sort?: number,
@@ -48,16 +45,17 @@ export class ProductController {
     if (limit > 50) {
       limit = 50;
     }
-    return this.productService.findManyWithPagination(
+    return this.productService.searching(
+      searchProductDto,
       {
         page,
         limit,
       },
       fields,
-      { ...filters } as EntityCondition<Product>,
+      {},
       { [column]: sort },
       ['name'],
-      ['image'],
+      true,
     );
   }
 
@@ -84,6 +82,7 @@ export class ProductController {
       {},
       { [column]: sort },
       ['name'],
+      false,
     );
   }
 
