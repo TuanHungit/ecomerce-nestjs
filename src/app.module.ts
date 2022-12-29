@@ -38,6 +38,7 @@ import momoConfig from './config/momo.config';
 import { CartModule } from './cart/cart.module';
 import { AddressModule } from './address/address.module';
 import { CashModule } from './payments/cash/cash.module';
+import { StatisticalModule } from './statistical/statistical.module';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { CashModule } from './payments/cash/cash.module';
     ReviewModule,
     CartModule,
     AddressModule,
+    StatisticalModule,
   ],
 })
 export class AppModule {}
