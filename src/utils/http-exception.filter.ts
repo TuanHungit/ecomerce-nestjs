@@ -45,7 +45,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
     };
-
+    console.log('');
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
 }
